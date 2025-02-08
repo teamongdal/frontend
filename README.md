@@ -22,7 +22,6 @@ yarn install
 # 3. 프로젝트 실행 Expo
 yarn start
 실행 후 w 클릭 > http://localhost:8081에서 실행 가능
-```
 
 frontend/
 │── src/                # 프로젝트 소스 코드
@@ -39,3 +38,5 @@ frontend/
 │── package.json        # 프로젝트 메타데이터 및 의존성 목록
 │── yarn.lock           # 패키지 버전 고정 파일
 │── app.json            # Expo 앱 설정 파일
+
+```
