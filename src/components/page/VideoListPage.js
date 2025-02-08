@@ -5,19 +5,14 @@ import VideoItem from "../molecule/VideoItem";
 
 const VideoListPage = () => {
   const navigation = useNavigation();
-  const [videoLisData, setVideoListData] = useState([]); // ✅ 배열로 초기화
-  const [isLoading, setIsLoading] = useState(true); // ✅ 초기값 `true`
-
-  useEffect(() => {
-    console.log("videoLisData: ", videoLisData);
-  }, [videoLisData]);
-
+  const [videoList, setVideoListData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/video_list")
       .then((response) => response.json())
       .then((data) => {
-        console.log("API 응답 데이터:", data); // ✅ 응답 데이터 구조 확인
-        setVideoListData(data || []); // ✅ 데이터가 undefined일 경우 빈 배열 설정
+        console.log("API 응답 데이터:", data);
+        setVideoListData(data || []);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -27,15 +22,15 @@ const VideoListPage = () => {
   }, []);
 
   const handleClickVideoItem = (videoId) => {
-    navigation.navigate("VideoItem", { videoId });
+    navigation.navigate("VideoDetail", { videoId });
   };
 
   return (
     <View>
       {isLoading ? (
         <Text>로딩 중...</Text>
-      ) : videoLisData.length > 0 ? (
-        videoLisData.map((data, idx) => (
+      ) : videoList.length > 0 ? (
+        videoList.map((data, idx) => (
           <TouchableOpacity
             key={idx}
             onPress={() => handleClickVideoItem(data.video_id)}
