@@ -22,6 +22,7 @@ yarn install
 # 3. 프로젝트 실행 Expo
 yarn start
 실행 후 w 클릭 > http://localhost:8081에서 실행 가능
+```
 
 frontend/
 │── src/                # 프로젝트 소스 코드
