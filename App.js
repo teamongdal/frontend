@@ -18,6 +18,7 @@ const TabNavigator = () => {
       <Tab.Screen name="VideoList" component={VideoListPage} />
       <Tab.Screen name="ProductList" component={ProductListPage} />
       <Tab.Screen name="Highlight" component={HighlightPage} />
+      <Tab.Screen name="Cart" component={CartPage} />
     </Tab.Navigator>
   );
 };
