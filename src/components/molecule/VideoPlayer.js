@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   playPauseButton: {
     position: "absolute",
-    bottom: 50,
+    top: "45%",
     left: "50%",
     transform: [{ translateX: -30 }],
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -66,8 +66,9 @@ const styles = StyleSheet.create({
   },
   text: {
     position: "absolute",
+    top: "55%",
     bottom: 20,
-    left: "50%",
+    left: "51%",
     transform: [{ translateX: -40 }],
     fontSize: 18,
     color: "white",

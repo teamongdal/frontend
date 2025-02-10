@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import VideoPlayer from "../molecule/VideoPlayer";
+
+const { width, height } = Dimensions.get("window");
 
 const VideoDetailPage = ({ route }) => {
   const { videoId } = route.params;
@@ -19,13 +21,15 @@ const VideoDetailPage = ({ route }) => {
         setLoading(false);
       })
       .catch((error) => {
+        console.error("API 요청 실패:", error);
         setLoading(false);
       });
   }, [videoId]);
 
   return (
-    <View>
-      {!loading && !!videoData && (
+    <View style={styles.container}>
+      <Text style={styles.title}>{videoData?.video_name}</Text>
+      {!loading && videoData && (
         <VideoPlayer
           videoUrl={videoData.video_url}
           videoName={videoData.video_name}
@@ -34,5 +38,19 @@ const VideoDetailPage = ({ route }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+});
 
 export default VideoDetailPage;
