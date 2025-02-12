@@ -49,7 +49,7 @@ export default function VideoContentPage() {
     <View style={styles.container}>
       <View style={styles.sidebar}>
         {sideIcons.map((icon, index) => (
-          <Icon name={icon} size={30} color="gray" />
+          <Icon key={index} name={icon} size={30} color="gray" />
         ))}
       </View>
       <View style={styles.mainContent}>

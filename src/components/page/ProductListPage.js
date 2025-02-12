@@ -11,8 +11,10 @@ import {
 
 const ProductListPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [productListData, setProductListData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const productData = [
+  const productDataDummy = [
     {
       product_id: 1,
       product_pic_url:
@@ -82,8 +84,8 @@ const ProductListPage = () => {
 
   return (
     <View style={styles.container}>
-      {Array.isArray(productData) &&
-        productData.map((data, idx) => (
+      {Array.isArray(productDataDummy) &&
+        productDataDummy.map((data, idx) => (
           <React.Fragment key={idx}>
             <TouchableOpacity onPress={handlePrev} style={styles.arrowButton}>
               <Text style={styles.arrow}>{"〈"}</Text>
