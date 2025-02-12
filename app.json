@@ -26,18 +26,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["android.permission.RECORD_AUDIO"],
       "package": "com.jeongyun0jang.frontend"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
     },
-    "plugins": [
-      "react-native-video",
-      "expo-speech-recognition"
-    ],
+    "plugins": ["react-native-video", "expo-speech-recognition"],
     "extra": {
       "eas": {
         "projectId": "8a16e2fa-31e3-4099-bb67-11d640a48bc1"
