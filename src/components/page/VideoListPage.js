@@ -28,7 +28,7 @@ export default function VideoContentPage() {
     "https://image.tving.com/ntgs/contents/CTC/caip/CAIP0900/ko/20240329/0100/P001754312.jpg/dims/resize/480";
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/video_list")
+    fetch(`http://127.0.0.1:8000/api/video_list?user_id=1`)
       .then((response) => response.json())
       .then((data) => {
         console.log("API 응답 데이터:", data);

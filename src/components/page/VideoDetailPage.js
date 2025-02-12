@@ -14,7 +14,7 @@ const VideoDetailPage = ({ route }) => {
       return;
     }
 
-    fetch(`http://127.0.0.1:8000/api/video_fetch?video_id=${videoId}`)
+    fetch(`http://127.0.0.1:8000/api/video_play?video_id=${videoId}`)
       .then((response) => response.json())
       .then((data) => {
         setVideoData(data);
