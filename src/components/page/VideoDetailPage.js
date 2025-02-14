@@ -33,7 +33,7 @@ const VideoDetailPage = ({ route }) => {
   useEffect(() => {
     if (!videoId) return;
 
-    fetch(`http://127.0.0.1:8000/api/video_play?video_id=${videoId}`)
+    fetch(`http://127.0.0.1:8000/api/video_play?video_id=video_0001`)
       .then((response) => response.json())
       .then((data) => {
         setVideoData(data);

@@ -25,7 +25,7 @@ const VoicePage = () => {
   // }, []);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/video_play?video_id=1`)
+    fetch(`http://127.0.0.1:8000/api/video_play?video_id=video_0001`)
       .then((response) => response.json())
       .then(() => setLoading(false))
       .catch((error) => {
