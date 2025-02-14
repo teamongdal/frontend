@@ -7,23 +7,22 @@ import {
   Platform,
   PermissionsAndroid,
 } from "react-native";
-import AudioRecorderPlayer from "react-native-audio-recorder-player";
+import AudioRecord from "react-native-audio-record";
 import io from "socket.io-client";
 import RNFS from "react-native-fs";
 
-const SERVER_URL = "http://127.0.0.1:8000/"; // 백엔드 서버 주소
-const audioRecorderPlayer = new AudioRecorderPlayer();
-const socket = useRef(null); // ✅ WebSocket useRef 사용
-
 const VoicePage = () => {
+  const SERVER_URL = "http://127.0.0.1:8000/"; // 백엔드 서버 주소
+
   const [transcription, setTranscription] = useState(""); // 변환된 텍스트
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(true);
   const [capturedImage, setCapturedImage] = useState(null);
+  const socket = useRef(null); // WebSocket
 
-  useEffect(() => {
-    requestPermissions(); // ✅ 앱 실행 시 마이크 권한 요청
-  }, []);
+  // useEffect(() => {
+  //   requestPermissions(); // ✅ 앱 실행 시 마이크 권한 요청
+  // }, []);
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/video_play?video_id=1`)
@@ -36,97 +35,61 @@ const VoicePage = () => {
   }, []);
 
   useEffect(() => {
-    // ✅ WebSocket 연결
-    socket.current = io(SERVER_URL, { transports: ["websocket"] });
-
-    socket.current.on("connect", () => {
-      console.log("✅ WebSocket Connected!");
-    });
-
-    startRecording(); // 녹음 시작
-
-    socket.current.on("disconnect", () => {
-      console.log("❌ WebSocket Disconnected!");
-    });
-
-    socket.current.on("error", (error) => {
-      console.error("❌ WebSocket Error:", error);
-    });
-
-    socket.current.on("wake_word_detected", () => {
-      console.log("✅ '새미야' 감지됨! 비디오 캡처 시작");
-      try {
-        handleCapture();
-      } catch (error) {
-        console.error("❌ handleCapture 실행 중 오류 발생:", error);
+    const initWebSocketAndStartRecording = async () => {
+      // ✅ 마이크 권한 요청
+      const hasPermission = await requestPermissions();
+      if (!hasPermission) {
+        console.log("🚫 마이크 권한 없음. 녹음 불가.");
+        return;
       }
-    });
 
-    socket.current.on("result_data", (data) => {
-      console.log("📦 서버 응답:", data);
-      setTranscription(data.text);
-    });
+      // ✅ WebSocket 연결
+      socket.current = io(SERVER_URL, { transports: ["websocket"] });
 
-    return () => {
-      if (socket.current) {
-        socket.current.disconnect();
-        console.log("❌ WebSocket Disconnected");
-      }
-    };
-  }, []);
+      socket.current.on("connect", () => {
+        console.log("✅ WebSocket Connected!");
+        startRecording(); // 🎤 WebSocket 연결 후 녹음 시작
+      });
 
-  const requestPermissions = async () => {
-    if (Platform.OS === "android") {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-          {
-            title: "마이크 권한 요청",
-            message: "이 앱은 음성 녹음을 위해 마이크를 사용합니다.",
-            buttonNeutral: "나중에",
-            buttonNegative: "취소",
-            buttonPositive: "확인",
-          }
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("❌ 마이크 권한 거부됨");
-          return false;
+      socket.current.on("result_data", (data) => {
+        console.log("📦 서버 응답:", data);
+        setTranscription(data.text);
+      });
+
+      return () => {
+        if (socket.current) {
+          socket.current.disconnect();
+          console.log("❌ WebSocket Disconnected");
         }
-      } catch (error) {
-        console.error("❌ 권한 요청 실패:", error);
-        return false;
-      }
-    }
-    return true;
-  };
+      };
+    };
+
+    initWebSocketAndStartRecording();
+  }, []);
 
   const startRecording = async () => {
     try {
       console.log("🎤 Start Recording...");
 
-      // ✅ 저장 경로: 앱 내부 저장소 사용
-      const filePath =
-        Platform.OS === "ios"
-          ? `${RNFS.DocumentDirectoryPath}/recording.m4a` // iOS: AAC
-          : `${RNFS.DocumentDirectoryPath}/recording.aac`; // Android: AAC
-
-      console.log("📁 저장 경로:", filePath);
-
-      const result = await audioRecorderPlayer.startRecorder(filePath, {
-        AVFormatIDKeyIOS: "kAudioFormatMPEG4AAC", // ✅ iOS는 AAC 사용
-        AudioEncoderAndroid: "aac", // ✅ Android도 AAC 사용
+      // ✅ WAV 포맷으로 설정 (PCM 16-bit, 44.1kHz, Mono)
+      AudioRecord.init({
+        sampleRate: 44100,
+        channels: 1,
+        bitsPerSample: 16, // PCM 16-bit
+        wavFile: "recording.wav", // iOS/Android 모두 WAV 저장
       });
 
-      console.log("🎤 Recorder started:", result);
+      AudioRecord.start();
+      setIsRecording(true);
 
-      audioRecorderPlayer.addRecordBackListener((e) => {
-        console.log("🎤 Recording Buffer:", e.recordingBuffer);
-        if (socket.current) {
-          socket.current.emit("audio_stream", e.recordingBuffer);
+      // 🎤 WebSocket으로 실시간 전송
+      AudioRecord.on("data", (data) => {
+        console.log("🎤 Recording Buffer Size:", data.length);
+
+        if (data.length > 0 && socket.current) {
+          socket.current.emit("audio_stream", data);
         }
       });
-
-      setIsRecording(true);
     } catch (error) {
       console.error("❌ Recording Error:", error);
     }
@@ -135,8 +98,8 @@ const VoicePage = () => {
   const stopRecording = async () => {
     setIsRecording(false);
     try {
-      await audioRecorderPlayer.stopRecorder();
-      console.log("⏹ 녹음 중지됨");
+      const audioFile = await AudioRecord.stop();
+      console.log("📁 녹음 파일 저장 위치:", audioFile);
     } catch (error) {
       console.error("❌ 녹음 중지 오류:", error);
     }
