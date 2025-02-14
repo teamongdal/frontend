@@ -10,6 +10,7 @@ import VideoDetailPage from "./src/components/page/VideoDetailPage";
 import VideoListPage from "./src/components/page/VideoListPage";
 import TestPage from "./src/components/page/TestPage";
 import TestAPIPage from "./src/components/page/TestAPIPage";
+import VoicePage from "./src/components/page/VoicePage";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -22,6 +23,7 @@ const TabNavigator = () => {
       {/* <Tab.Screen name="Highlight" component={HighlightPage} /> */}
       <Tab.Screen name="Cart" component={CartPage} />
       <Tab.Screen name="TestAPI" component={TestAPIPage} />
+      <Tab.Screen name="VoicePage" component={VoicePage} />
     </Tab.Navigator>
   );
 };
@@ -40,6 +42,7 @@ const App = () => {
         <Stack.Screen name="Products" component={ProductListPage} />
         <Stack.Screen name="Cart" component={CartPage} />
         <Stack.Screen name="TestApi" component={TestAPIPage} />
+        <Stack.Screen name="VoicePage" component={VoicePage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

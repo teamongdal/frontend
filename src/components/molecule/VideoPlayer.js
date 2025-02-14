@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, forwardRef } from "react";
 import {
   View,
   TouchableOpacity,
@@ -7,26 +7,24 @@ import {
   Dimensions,
 } from "react-native";
 import Video from "react-native-video";
-import ViewShot from "react-native-view-shot";
 import Icon from "react-native-vector-icons/FontAwesome";
-// import viewName from "../../../node_modules/react-native/jest/mockNativeComponent";
 
-const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
+const { width, height } = Dimensions.get("window");
 
-const VideoPlayer = ({ videoUrl, videoName }) => {
-  const videoRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(true); // 기본값: 자동 재생
+// ✅ `forwardRef` 적용 후 export default
+const VideoPlayer = forwardRef(({ videoUrl, videoName }, ref) => {
+  const [isPlaying, setIsPlaying] = useState(true);
 
   return (
     <>
       <Text>{videoName}</Text>
       <View style={styles.container}>
         <Video
-          ref={videoRef}
+          ref={ref} // ✅ 부모 컴포넌트에서 전달된 ref 적용
           source={{ uri: videoUrl }}
           style={styles.video}
           resizeMode="cover"
-          paused={!isPlaying} // 자동 재생
+          paused={!isPlaying}
         />
         <TouchableOpacity
           style={styles.playPauseButton}
@@ -34,12 +32,14 @@ const VideoPlayer = ({ videoUrl, videoName }) => {
         >
           <Icon name={isPlaying ? "pause" : "play"} size={30} color="white" />
         </TouchableOpacity>
-
         <Text style={styles.text}>{isPlaying ? "재생 중" : "멈춤 상태"}</Text>
       </View>
     </>
   );
-};
+});
+
+// ✅ `export default VideoPlayer`를 올바르게 적용
+export default VideoPlayer;
 
 const styles = StyleSheet.create({
   container: {
@@ -74,5 +74,3 @@ const styles = StyleSheet.create({
     color: "white",
   },
 });
-
-export default VideoPlayer;

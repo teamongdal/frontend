@@ -16,7 +16,7 @@ const sideIcons = [
   "star",
   "home",
   "film",
-  "theater-masks",
+  // "theater-masks",
   "smile-o",
 ];
 
