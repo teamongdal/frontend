@@ -40,7 +40,7 @@ const VideoDetailPage = ({ route }) => {
     try {
       if (videoRef.current) {
         videoRef.current.pause();
-        setIsPlaying(() => !isPlaying);
+        setIsPlaying(() => (isPlaying ? !isPlaying : isPlaying));
       }
 
       const uri = await captureRef(viewShotRef, {
