@@ -1,87 +1,131 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  FlatList,
   Image,
   StyleSheet,
-  TouchableOpacity,
+  ActivityIndicator,
+  FlatList,
+  Dimensions,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import ProductItem from "../molecule/ProductItem";
+import highlightImage from "../../assets/video/highlight_0001_0001.png";
+const { width } = Dimensions.get("window"); // 화면 크기 가져오기
+const SERVER_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
 
-const HighlightPage = () => {
-  const navigation = useNavigation();
-  const [highlightList, setHighlightList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const HighlightScene = () => {
+  const [highlightData, setHighlightData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const productImage =
+    "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/recommendations/images/product_images/blazer_0009_00.jpg";
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/highlight_product_list?video_id=1")
+    fetch(`${SERVER_URL}/api/all_product_list?video_id=video_0001`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("data", data);
-        setHighlightList(data || []);
-        setIsLoading(false);
+        console.log("data: ", data);
+        setHighlightData(data.all_product_list);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("API 요청 실패:", error);
-        setIsLoading(false); // 오류 발생 시 false로 변경
+        setIsLoading(true);
       });
   }, []);
 
-  const handleClickProductItem = (productId) => {
-    navigation.navigate("ProductDetail", { productId });
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <Image
-        source={{
-          uri: "https://image.tving.com/ntgs/contents/CTC/caip/CAIP0900/ko/20240329/0100/P001754312.jpg/dims/resize/480",
-        }}
-        style={styles.image}
-      />
-      <TouchableOpacity
-        onPress={() => handleClickProductItem(item.product_id)}
-        style={styles.infoContainer}
-      >
-        <ProductItem
-          productId={item.product_id}
-          productName={item.product_name}
-          productPrice={item.price}
-          productImage={
-            "https://image.msscdn.net/thumbnails/images/goods_img/20230817/3469871/3469871_17321622059740_big.png?w=1200"
-          }
-        />
-      </TouchableOpacity>
-    </View>
-  );
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>주요 장면</Text>
       <FlatList
-        data={highlightList}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.product_id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
+        data={highlightData}
+        keyExtractor={(item) => item.highlight_idx.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.highlightContainer}>
+            {/* 왼쪽: 주요 장면 */}
+            <Image
+              source={highlightImage}
+              style={[
+                styles.sceneImage,
+                { width: width * 0.35, height: width * 0.2 },
+              ]} // 반응형 크기
+            />
+
+            {/* 오른쪽: 상품 정보 */}
+            <View style={styles.productContainer}>
+              <Image
+                source={{ uri: productImage }}
+                style={[
+                  styles.productImage,
+                  { width: width * 0.15, height: width * 0.15 },
+                ]}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.brand}>{item.brand_name}</Text>
+                <Text style={styles.productName} numberOfLines={1}>
+                  {item.product_name}
+                </Text>
+                <Text style={styles.price}>{item.final_price}</Text>
+              </View>
+            </View>
+          </View>
+        )}
       />
     </View>
   );
 };
-
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: "#20302A" },
-  itemContainer: { flexDirection: "row", marginRight: 10 },
-  image: { width: 100, height: 100, borderRadius: 10 },
-  infoContainer: { padding: 10 },
-  title: {
-    fontSize: 20,
+  container: {
+    flex: 1,
+    backgroundColor: "#2E4A41",
+    padding: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#2E4A41",
+  },
+  highlightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  sceneImage: {
+    borderRadius: 10,
+  },
+  productContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 20,
+    flex: 1,
+  },
+  productImage: {
+    borderRadius: 10,
+    marginRight: 16,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  brand: {
+    fontSize: width * 0.018, // 가변적인 폰트 크기
     fontWeight: "bold",
-    color: "white",
-    marginBottom: 10,
+    color: "#D4A017",
+  },
+  productName: {
+    fontSize: width * 0.016,
+    color: "#EDEDED",
+    marginVertical: 4,
+  },
+  price: {
+    fontSize: width * 0.02,
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
 });
-
-export default HighlightPage;
+export default HighlightScene;
