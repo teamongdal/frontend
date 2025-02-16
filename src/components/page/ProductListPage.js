@@ -29,28 +29,14 @@ const ProductListPage = () => {
       ],
       detail: "https://www.musinsa.com/products/3213670",
     },
-    {
-      product_id: 2,
-      product_pic_url:
-        "https://image.msscdn.net/thumbnails/images/goods_img/20220311/2413945/2413945_2_big.jpg?w=1200",
-      brand_name: "브랜드2",
-      product_name: "오버 핏 타입2 트러커 재킷 [다크 그레이]",
-      price: "35,890원",
-      product_pic_detail_url: [
-        "https://image.msscdn.net/thumbnails/images/prd_img/20220311/2413945/detail_2413945_39_big.jpg?w=1200",
-        "https://image.msscdn.net/thumbnails/images/prd_img/20220311/2413945/detail_2413945_4_big.jpg?w=1200",
-        "https://image.msscdn.net/thumbnails/images/prd_img/20220311/2413945/detail_2413945_11_big.jpg?w=1200",
-      ],
-      detail: "https://www.musinsa.com/products/2413945",
-    },
   ];
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/similar_product_list")
+    fetch(`http://127.0.0.1:8000/api/product_list?user_id=user_0001`)
       .then((response) => response.json())
       .then((data) => {
         console.log("API 응답 데이터:", data);
-        setProductListData(data || []);
+        setProductListData(data.product_list || []);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -58,6 +44,10 @@ const ProductListPage = () => {
         setIsLoading(true);
       });
   }, []);
+
+  const handleClickDetail = () => {
+    console.log("click");
+  };
 
   const handleClickProductItemLike = (userId, productId) => {
     fetch("http://127.0.0.1:8000/api/product_like", {
@@ -100,33 +90,13 @@ const ProductListPage = () => {
               <Text style={styles.brand}>{data.brand_name}</Text>
               <Text style={styles.productName}>{data.product_name}</Text>
               <Text style={styles.price}>{data.price}</Text>
-              <View style={styles.thumbnailContainer}>
-                {data.product_pic_detail_url.map((img, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => setCurrentIndex(index)}
-                  >
-                    <Image
-                      source={{ uri: img }}
-                      style={[
-                        styles.thumbnail,
-                        currentIndex === index && styles.selectedThumbnail,
-                      ]}
-                    />
-                  </TouchableOpacity>
-                ))}
-              </View>
-              <View style={styles.actionContainer}>
-                <TouchableOpacity style={styles.detailButton}>
-                  <Text style={styles.detailText}>← 세부정보</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.detailButton}>
-                  <Text style={styles.detailText}>〈 이전</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.detailButton}>
-                  <Text style={styles.detailText}>다음 〉</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity onPress={() => handleClickDetail()}>
+                <View style={styles.thumbnailContainer}>
+                  {data.product_pic_detail_url.map((img, index) => (
+                    <Image source={{ uri: img }} style={[styles.thumbnail]} />
+                  ))}
+                </View>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={handleNext} style={styles.arrowButton}>
               <Text style={styles.arrow}>{"〉"}</Text>
@@ -149,7 +119,6 @@ const styles = StyleSheet.create({
   price: { color: "#FFD700", fontSize: 20, fontWeight: "bold" },
   thumbnailContainer: { flexDirection: "row", marginVertical: 10 },
   thumbnail: { width: 50, height: 50, marginHorizontal: 5, borderRadius: 5 },
-  selectedThumbnail: { borderWidth: 2, borderColor: "#FFD700" },
   actionContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
