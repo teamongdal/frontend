@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import VideoPlayer from "../molecule/VideoPlayer";
 import ViewShot, { captureRef } from "react-native-view-shot";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,6 +22,7 @@ const VideoDetailPage = ({ route }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef(null);
   const viewShotRef = useRef(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (!videoId) return;
@@ -74,7 +77,7 @@ const VideoDetailPage = ({ route }) => {
       </ViewShot>
 
       <TouchableOpacity style={styles.captureButton} onPress={handleCapture}>
-        <Text style={styles.buttonText}>📸 캡처하기</Text>
+        <Text style={styles.buttonText}>유사상품 찾기</Text>
       </TouchableOpacity>
 
       {capturedImage && (
@@ -87,7 +90,7 @@ const VideoDetailPage = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000", // 검은 배경
+    backgroundColor: "#000",
     justifyContent: "flex-start",
     alignItems: "center",
     width: "100%",
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     width: width,
-    height: height, // 화면을 꽉 채우기
+    height: (width * 9) / 16,
     backgroundColor: "black",
   },
   captureButton: {
@@ -111,6 +114,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   capturedImage: {
+    position: "absolute",
     width: width * 0.5,
     height: width * 0.3,
     marginTop: 10,

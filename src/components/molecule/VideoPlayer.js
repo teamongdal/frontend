@@ -30,17 +30,12 @@ export default VideoPlayer;
 const styles = StyleSheet.create({
   container: {
     width: width,
-    height: height,
-    position: "absolute",
-    top: 0,
-    left: 0,
+    height: (width * 9) / 16,
   },
   video: {
-    width: width,
-    height: height, // 화면을 꽉 채우기
     position: "absolute",
-    top: 0,
-    left: 0,
+    width: "100%",
+    height: "100%",
   },
   playPauseButton: {
     position: "absolute",
