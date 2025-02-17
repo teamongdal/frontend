@@ -1,48 +1,69 @@
 import React, { useState, useRef } from "react";
-import { View, Button, Text, StyleSheet, Platform } from "react-native";
+import { View, Button, Text, StyleSheet, Platform, Image } from "react-native";
 import { Audio } from "expo-av";
 
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
 
-const AudioRecorder = () => {
+const TestAPIPage = () => {
   const [recording, setRecording] = useState(null);
   const [filePath, setFilePath] = useState(null);
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [transcription, setTranscription] = useState("");
 
-  const startRecording = async () => {
+  async function startRecording() {
     try {
-      const { granted } = await Audio.requestPermissionsAsync();
-      if (!granted) {
-        alert("마이크 접근 권한이 필요합니다.");
-        return;
+      if (permissionResponse.status !== "granted") {
+        console.log("Requesting permission..");
+        await requestPermission();
       }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
 
-      const newRecording = new Audio.Recording();
-      await newRecording.prepareToRecordAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-      );
-      await newRecording.startAsync();
-      setRecording(newRecording);
-    } catch (error) {
-      console.error("Error starting recording:", error);
+      console.log("Starting recording..");
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync({
+        isMeteringEnabled: false,
+        android: {
+          extension: ".wav",
+          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT,
+          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AMR_NB,
+          sampleRate: 44100,
+          numberOfChannels: 1, // 모노 설정
+          bitRate: 128000,
+        },
+        ios: {
+          extension: ".wav",
+          outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
+          audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
+          sampleRate: 44100,
+          numberOfChannels: 1, // 모노 설정
+          bitRate: 128000,
+        },
+      });
+
+      await recording.startAsync();
+      setRecording(recording);
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Failed to start recording", err);
     }
-  };
+  }
 
-  const stopRecording = async () => {
-    try {
-      if (!recording) return;
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
-      setFilePath(uri);
-      console.log("Recording saved at:", uri);
-      sendAudioToServer(uri);
-    } catch (error) {
-      console.error("Error stopping recording:", error);
-    }
-  };
+  async function stopRecording() {
+    console.log("Stopping recording..");
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+    });
+    const uri = recording.getURI();
+    console.log("Recording stopped and stored at", uri);
+    sendAudioToServer(uri);
+  }
 
-  //blob 사용
   const sendAudioToServer = async (uri) => {
     try {
       let fileBlob = null;
@@ -55,19 +76,31 @@ const AudioRecorder = () => {
 
       const formData = new FormData();
 
+      const imageFile = Image.resolveAssetSource(
+        require("../../assets/video/highlight_0001_0001.png")
+      ).uri;
+
+      // 이미지 파일 추가
+      formData.append("image", {
+        uri: imageFile,
+        name: "captured_image.png",
+        type: "image/png",
+      });
+
       if (Platform.OS === "web") {
         console.log("fileBlob", fileBlob);
-        formData.append("audio", fileBlob, "recorded_audio.webm"); // Web에서는 Blob 객체 사용
+        formData.append("audio", fileBlob, "recorded_audio.webm"); // Web에서는 Blob 객체 사용 <-- .webm -> wav
       } else {
+        const fileType = uri.endsWith(".wav") ? "audio/wav" : "audio/m4a"; // iOS의 경우 확장자 확인
         formData.append("audio", {
           uri: uri.startsWith("file://") ? uri : `file://${uri}`,
-          name: "recorded_audio.wav",
-          type: "audio/wav",
+          name: `recorded_audio.${fileType === "audio/wav" ? "wav" : "m4a"}`, // iOS 확장자 확인
+          type: fileType,
         });
       }
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/search_product?user_id=1",
+        "http://127.0.0.1:8000/api/search_product?user_id=user_0001",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -94,6 +127,10 @@ const AudioRecorder = () => {
         disabled={!!recording}
       />
       <Button title="녹음 종료" onPress={stopRecording} disabled={!recording} />
+      {/* <Button
+        title="녹음 듣기"
+        onPress={playRecording}
+      /> */}
       <Text>Transcription: {transcription}</Text>
     </View>
   );
@@ -108,4 +145,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AudioRecorder;
+export default TestAPIPage;
