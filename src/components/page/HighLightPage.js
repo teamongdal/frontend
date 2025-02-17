@@ -12,7 +12,7 @@ import highlightImage from "../../assets/video/highlight_0001_0001.png";
 const { width } = Dimensions.get("window"); // 화면 크기 가져오기
 const SERVER_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
 
-const HighlightScene = () => {
+const HighlightPage = () => {
   const [highlightData, setHighlightData] = useState([]);
   const [loading, setLoading] = useState(true);
   const productImage =
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
-export default HighlightScene;
+export default HighlightPage;

@@ -93,7 +93,11 @@ const ProductListPage = () => {
               <TouchableOpacity onPress={() => handleClickDetail()}>
                 <View style={styles.thumbnailContainer}>
                   {data.product_pic_detail_url.map((img, index) => (
-                    <Image source={{ uri: img }} style={[styles.thumbnail]} />
+                    <Image
+                      source={{ uri: img }}
+                      style={[styles.thumbnail]}
+                      key={idx}
+                    ></Image>
                   ))}
                 </View>
               </TouchableOpacity>
