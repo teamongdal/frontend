@@ -20,7 +20,7 @@ const TabNavigator = () => {
       <Tab.Screen name="VideoList" component={VideoListPage} />
       <Tab.Screen name="WishlistPage" component={WishlistPage} />
       <Tab.Screen name="Highlight" component={HighlightPage} />
-      <Tab.Screen name="Cart" component={CartPage} />
+      {/* <Tab.Screen name="Cart" component={CartPage} /> */}
       <Tab.Screen name="ProductListTest" component={ProductListTestPage} />
     </Tab.Navigator>
   );
@@ -38,7 +38,7 @@ const App = () => {
         <Stack.Screen name="VideoDetail" component={VideoDetailPage} />
         <Stack.Screen name="Highlight" component={HighlightPage} />
         <Stack.Screen name="WishlistPage" component={WishlistPage} />
-        <Stack.Screen name="Cart" component={CartPage} />
+        {/* <Stack.Screen name="Cart" component={CartPage} /> */}
         <Stack.Screen name="ProductListTest" component={ProductListTestPage} />
       </Stack.Navigator>
     </NavigationContainer>
