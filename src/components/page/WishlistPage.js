@@ -13,16 +13,17 @@ import {
 import CheckBox from "@react-native-community/checkbox";
 
 const { width } = Dimensions.get("window");
-const ITEM_WIDTH = (width - 48) / 2; // 양쪽 패딩 포함한 2열 그리드 크기
+const ITEM_WIDTH = (width - 48) / 2;
 
 const WishlistPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [isFilterEnabled, setIsFilterEnabled] = useState(false);
-  const [deleteItemList, setDeleteItemList] = useState([]); //
+  const [deleteItemList, setDeleteItemList] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [productCodeList, setProductCodeList] = useState([]); // 전체 product_code 담음
+  const [isLoading, setIsLoading] = useState(false);
+  const [productCodeList, setProductCodeList] = useState([]);
 
-  const API_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
+  const API_URL = "http://127.0.0.1:8000";
 
   useEffect(() => {
     setProductCodeList(cartItems.map((item) => item.product_code));
@@ -42,8 +43,6 @@ const WishlistPage = () => {
     fetch(`${API_URL}/api/cart_list?user_id=user_0001`)
       .then((response) => response.json())
       .then((data) => {
-        // console.log("API 응답 데이터:", data);
-
         setCartItems(data.cart_list || []);
         setIsLoading(false);
       })
@@ -72,11 +71,10 @@ const WishlistPage = () => {
   const toggleItemSelection = (productCode) => {
     if (selectAll) {
     }
-    setDeleteItemList(
-      (prevList) =>
-        prevList.includes(productCode)
-          ? prevList.filter((itemId) => itemId !== productCode) // 이미 있으면 제거
-          : [...prevList, productCode] // 없으면 추가
+    setDeleteItemList((prevList) =>
+      prevList.includes(productCode)
+        ? prevList.filter((itemId) => itemId !== productCode)
+        : [...prevList, productCode]
     );
   };
 
@@ -87,34 +85,19 @@ const WishlistPage = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/product_unlike`, {
+      fetch(`${API_URL}/api/cart_unlike?user_id=user_0001`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          user_id: "user_0001", // ✅ FastAPI에서 Body로 받음
-          product_code: deleteItemList, // ✅ 배열 형태로 전송
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        console.log("삭제 성공:", result);
-
-        // ✅ 삭제된 항목을 UI에서 업데이트
-        setCartItems((prevItems) =>
-          prevItems.filter(
-            (item) => !deleteItemList.includes(item.product_code)
-          )
-        );
-        setSelectAll(false);
-        setDeleteItemList([]);
-      } else {
-        console.error("삭제 실패:", result);
-        alert("서버에서 삭제할 상품을 찾을 수 없습니다.");
-      }
+        body: JSON.stringify(deleteItemList),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setCartItems(data.cart_list);
+          console.log("API 응답 데이터:", data);
+        })
+        .catch((error) => console.error("API 요청 실패:", error));
     } catch (error) {
       console.error("선택 삭제 요청 실패:", error);
     }
@@ -132,13 +115,14 @@ const WishlistPage = () => {
 
       {/* 전체 선택 & 필터 */}
       <View style={styles.filterContainer}>
-        <CheckBox
-          value={selectAll && deleteItemList.length == cartItems.length}
-          onValueChange={toggleSelectAll}
-        />
-        {/* <TouchableOpacity> */}
-        <Text style={styles.selectAll}>전체</Text>
-        {/* </TouchableOpacity> */}
+        <View>
+          <CheckBox
+            value={selectAll && deleteItemList.length == cartItems.length}
+            onValueChange={toggleSelectAll}
+          />
+          <Text>{"전체"}</Text>
+        </View>
+
         <View style={styles.toggleContainer}>
           <Text>선택 상품만 보기</Text>
           <Switch
@@ -148,10 +132,7 @@ const WishlistPage = () => {
           />
         </View>
 
-        <TouchableOpacity
-          // style={styles.deleteButton}
-          onPress={deleteSelectedItems}
-        >
+        <TouchableOpacity onPress={deleteSelectedItems}>
           <Text style={styles.deleteButton}>선택 삭제</Text>
         </TouchableOpacity>
       </View>
@@ -165,13 +146,6 @@ const WishlistPage = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          // <TouchableOpacity
-          //   style={[
-          //     styles.itemContainer,
-          //     cartItems.includes(item.id) && styles.selectedItem,
-          //   ]}
-          //   onPress={() => toggleItemSelection(item.product_code)}
-          // >
           <View
             style={[
               styles.itemContainer,
@@ -182,10 +156,6 @@ const WishlistPage = () => {
               value={deleteItemList.includes(item.product_code)}
               onValueChange={() => toggleItemSelection(item.product_code)}
             />
-            <Text>{"선택 체크박스"}</Text>
-            {/* <View style={styles.checkbox}>
-              {cartItems.includes(item.id) && <Text>✅</Text>}
-            </View> */}
             {/* 제품 이미지 */}
             <Image source={{ uri: item.product_image }} style={styles.image} />
             {/* 브랜드명 */}
@@ -194,13 +164,12 @@ const WishlistPage = () => {
             <Text style={styles.productName}>{item.product_name}</Text>
             {/* 가격 & 할인율 */}
             <View style={styles.priceContainer}>
-              {/* <Text style={styles.discount}>{item.discount_rate}</Text> */}
               <Text style={styles.price}>{item.final_price}</Text>
             </View>
             {/* 평점 & 좋아요 */}
             <View style={styles.ratingContainer}>
               <Text style={styles.rating}>
-                ⭐{" "}
+                ⭐
                 {item.review_rating ?? item.review_rating == "없음"
                   ? 0
                   : item.review_rating}
@@ -209,7 +178,6 @@ const WishlistPage = () => {
               <Text style={styles.heart}>❤️ {item.heart_cnt ?? 0}</Text>
             </View>
           </View>
-          // </TouchableOpacity>
         )}
       />
     </View>
@@ -238,7 +206,7 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: "space-between",
   },
-  selectAll: { fontSize: 14, fontWeight: "bold" },
+  // selectAll: { fontSize: 14, fontWeight: "bold" },
   toggleContainer: { flexDirection: "row", alignItems: "center", gap: 8 },
   deleteButton: { color: "gray", fontSize: 14 },
   listContainer: { paddingHorizontal: 12, paddingBottom: 20 },
