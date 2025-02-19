@@ -12,14 +12,15 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { ProductModal } from "../molecule/modal/ProductModal";
 // import Swiper from "react-native-swiper";
-import Carousel from "react-native-reanimated-carousel";
+import Icon from "react-native-vector-icons/FontAwesome"; // ✅ 아이콘 변경
+import ProductCarousel from "../molecule/ProductCarousel"; // ✅ 추가된 Carousel 컴포넌트 불러오기
 
-const { width } = Dimensions.get("window"); // 화면 크기 가져오기
+const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
 
 const ProductListTestPage = () => {
   const carouselRef = useRef(null);
 
-  const productId = "cardigan_0002"; //route?.params?.videoId || null;
+  const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
   const navigation = useNavigation();
   const [productList, setProductList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +35,10 @@ const ProductListTestPage = () => {
   useEffect(() => {
     console.log("selectedProduct", selectedProduct);
   }, [selectedProduct]);
+
+  useEffect(() => {
+    console.log("productList: ", productList);
+  }, [productList]);
 
   useEffect(() => {
     if (!productId) return;
@@ -92,67 +97,6 @@ const ProductListTestPage = () => {
       </View>
       {/* 모달 */}
       {selectedProduct && (
-        // <Modal
-        //   animationType="slide"
-        //   transparent={true}
-        //   visible={modalVisible}
-        //   onRequestClose={closeModal}
-        // >
-        //   <View style={styles.modalOverlay}>
-        //     <View style={styles.modalContent}>
-        //       {/* 닫기 버튼 */}
-        //       <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-        //         <Text style={styles.closeButtonText}>✕</Text>
-        //       </TouchableOpacity>
-
-        //       {/* 브랜드 로고 & 이름 */}
-        //       <Image
-        //         source={{ uri: selectedProduct.brand_image }}
-        //         style={styles.brandImage}
-        //       />
-        //       <Text style={styles.brandName}>{selectedProduct.brand_name}</Text>
-
-        //       <Swiper
-        //         style={styles.swiper}
-        //         loop={true} // 무한 반복 가능하게 설정
-        //         showsPagination={true} // 아래 점 표시 활성화
-        //         paginationStyle={styles.pagination}
-        //         autoplay={false} // 자동 슬라이드 끄기 (필요 시 true로 변경)
-        //         horizontal={true} // 가로 스와이프 활성화 (기본값이지만 명시)
-        //       >
-        //         {selectedProduct.product_images.map((image, index) => (
-        //           <View key={index} style={styles.slide}>
-        //             <Image
-        //               source={{ uri: image }}
-        //               style={styles.productImage}
-        //             />
-        //           </View>
-        //         ))}
-        //       </Swiper>
-
-        //       {/* 상품 정보 */}
-        //       <ScrollView style={styles.scrollContainer}>
-        //         <Text style={styles.productName}>
-        //           {selectedProduct.product_name}
-        //         </Text>
-        //         <Text style={styles.discountRate}>
-        //           {selectedProduct.discount_rate} 할인
-        //         </Text>
-        //         <Text style={styles.finalPrice}>
-        //           {selectedProduct.final_price}
-        //         </Text>
-        //         <Text style={styles.finalPrice}>
-        //           ♥ {selectedProduct.heart_cnt} | {selectedProduct.category}
-        //         </Text>
-        //       </ScrollView>
-
-        //       {/* 구매 버튼 */}
-        //       <TouchableOpacity style={styles.confirmButton}>
-        //         <Text style={styles.confirmButtonText}>구매하기</Text>
-        //       </TouchableOpacity>
-        //     </View>
-        //   </View>
-        // </Modal>
         <Modal
           animationType="slide"
           transparent={true}
@@ -165,51 +109,76 @@ const ProductListTestPage = () => {
               <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
-
+              {/*이미지 캐러셀*/}
+              <ProductCarousel images={selectedProduct.product_images} />
               {/* 브랜드 로고 & 이름 */}
-              <Image
-                source={{ uri: selectedProduct.brand_image }}
-                style={styles.brandImage}
-              />
-              <Text style={styles.brandName}>{selectedProduct.brand_name}</Text>
-
-              {/* 이미지 캐러셀 적용 (react-native-reanimated-carousel) */}
-              <Carousel
-                ref={carouselRef}
-                data={selectedProduct.product_images}
-                width={width * 0.8}
-                height={200}
-                loop
-                autoPlay={false}
-                pagingEnabled
-                scrollAnimationDuration={500}
-                renderItem={({ item }) => (
-                  <View style={styles.slide}>
-                    <Image source={{ uri: item }} style={styles.productImage} />
-                  </View>
-                )}
-              />
-
+              <View style={styles.brandContainer}>
+                <Image
+                  source={{ uri: selectedProduct.brand_image }}
+                  style={styles.brandImage}
+                />
+                <Text style={styles.brandName}>
+                  {selectedProduct.brand_name}
+                </Text>
+                <Text style={styles.rating}>⭐ {selectedProduct.rating}</Text>
+              </View>
               {/* 상품 정보 */}
-              <ScrollView style={styles.scrollContainer}>
+              <View>
+                <Text style={styles.categoryTag}>
+                  {selectedProduct.category}
+                </Text>
                 <Text style={styles.productName}>
                   {selectedProduct.product_name}
                 </Text>
-                <Text style={styles.discountRate}>
-                  {selectedProduct.discount_rate} 할인
-                </Text>
-                <Text style={styles.finalPrice}>
-                  {selectedProduct.final_price}
-                </Text>
-                <Text style={styles.finalPrice}>
+
+                {/* 가격 및 할인율 */}
+                <View style={styles.priceContainer}>
+                  {selectedProduct.discount_rate !== "0%" && (
+                    <Text style={styles.discount}>
+                      {selectedProduct.discount_rate}
+                    </Text>
+                  )}
+                  <Text style={styles.price}>
+                    ₩ {selectedProduct.final_price}
+                  </Text>
+                </View>
+
+                {/* 찜(♥) 개수 & 카테고리 */}
+                <Text style={styles.heartCount}>
                   ♥ {selectedProduct.heart_cnt} | {selectedProduct.category}
                 </Text>
-              </ScrollView>
+              </View>
+              {/* 리뷰 정보 */}
+              <View>
+                {/* Details 제목 */}
+                <Text style={styles.detailsTitle}>Details</Text>
 
-              {/* 구매 버튼 */}
-              <TouchableOpacity style={styles.confirmButton}>
-                <Text style={styles.confirmButtonText}>구매하기</Text>
-              </TouchableOpacity>
+                {/* 설명 박스 */}
+                <View style={[styles.detailsBox]}>
+                  <Text style={styles.detailsText}>
+                    <Icon name="plus-circle" size={14} color="#fff" />{" "}
+                    <Text style={styles.detailsHighlight}>
+                      클래식과 트렌드의 완벽한 조화
+                    </Text>
+                  </Text>
+                  <Text style={styles.detailsContent}>
+                    리바이스의 시그니처 트러커 재킷 디자인에 코듀로이 소재를
+                    더해 클래식하면서도 트렌디한 무드를 완성했습니다. 어떤
+                    스타일에도 쉽게 매치할 수 있어 데일리룩부터 캐주얼룩까지
+                    활용도가 높습니다.
+                  </Text>
+                </View>
+
+                {/* 하트 아이콘 & 확인 버튼 */}
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.heartButton}>
+                    <Icon name="heart" size={22} color="#fff" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.confirmButton}>
+                    <Text style={styles.confirmButtonText}>확인</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           </View>
         </Modal>
@@ -293,7 +262,7 @@ const styles = StyleSheet.create({
   modalContent: {
     position: "absolute",
     height: "100%",
-    width: "80%",
+    width: "42%",
     backgroundColor: "#1a1a1a",
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
@@ -304,79 +273,144 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
   },
-
-  // 닫기 버튼
-  closeButton: { position: "absolute", top: 15, left: 15, zIndex: 10 },
-  closeButtonText: { fontSize: 20, color: "#fff" },
-
-  // 브랜드 이미지 & 브랜드명
-  brandImage: { width: 50, height: 50, borderRadius: 25, marginBottom: 10 },
-  brandName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    left: -30,
+    zIndex: 10,
   },
-
-  // // 스와이퍼
-  // swiper: { height: 220, width: "100%" },
-  // productImage: {
-  //   width: "100%",
-  //   height: 220,
-  //   borderRadius: 10,
-  //   resizeMode: "cover",
-  // },
-  // pagination: { bottom: 10 },
-  slide: {
+  closeButtonText: {
+    fontSize: 24,
+    color: "#fff",
+  },
+  brandContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    overflow: "hidden",
+    marginBottom: 10,
+  },
+  brandImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  brandName: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+    flex: 1,
+  },
+  rating: {
+    fontSize: 14,
+    color: "#ffd700",
   },
   productImage: {
-    width: width * 0.8,
-    height: 200,
-    borderRadius: 10,
-  },
-  scrollContainer: {
     width: "100%",
-    marginTop: 10,
+    height: width * 0.42,
+    borderRadius: 10,
+    resizeMode: "cover",
   },
-  // 상품 정보 텍스트
-  scrollContainer: { width: "100%", marginVertical: 10 },
+  categoryTag: {
+    backgroundColor: "#444",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    color: "#fff",
+    alignSelf: "flex-start",
+    marginBottom: 5,
+  },
   productName: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  discountRate: {
-    fontSize: 18,
-    color: "#ffcc00",
-    fontWeight: "bold",
-    textAlign: "center",
     marginBottom: 10,
   },
-  finalPrice: {
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  discount: {
     fontSize: 16,
-    color: "#ddd",
-    textAlign: "center",
+    color: "red",
+    fontWeight: "bold",
+    marginRight: 10,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  colorContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  colorCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: "#fff",
+  },
+  heartCount: {
+    fontSize: 14,
+    color: "#bbb",
+  },
+  detailsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 10,
+  },
+  detailsBox: {
+    backgroundColor: "#292929",
+    padding: 15,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  detailsText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 5,
   },
+  detailsHighlight: {
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  detailsContent: {
+    fontSize: 18,
+    color: "#ddd",
+    lineHeight: 22,
+    marginTop: 5,
+  },
 
-  // 구매 버튼
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 15,
+  },
+  heartButton: {
+    backgroundColor: "#a11a32",
+    padding: 10,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 50,
+    height: 50,
+  },
   confirmButton: {
-    width: "100%",
+    flex: 1,
+    backgroundColor: "#a11a32",
     padding: 12,
-    backgroundColor: "#ff9900",
     borderRadius: 10,
-    marginTop: 10,
+    alignItems: "center",
+    marginLeft: 10,
   },
   confirmButtonText: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
     color: "#fff",
   },
 });
