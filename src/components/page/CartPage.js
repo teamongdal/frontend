@@ -41,11 +41,12 @@ const CartPage = () => {
   }, [selectAll]);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/product_like_list?user_id=user_0001`)
+    fetch(`${API_URL}/api/cart_list?user_id=user_0001`)
       .then((response) => response.json())
       .then((data) => {
         console.log("API 응답 데이터:", data);
-        setCartItems(data.product_like_list || []);
+
+        setCartItems(data.cart_list || []);
         setIsLoading(false);
       })
       .catch((error) => {

@@ -5,10 +5,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Text } from "react-native";
 import CartPage from "./src/components/page/CartPage";
 import HighlightPage from "./src/components/page/HighlightPage";
-import ProductListPage from "./src/components/page/ProductListPage";
+import WishlistPage from "./src/components/page/WishlistPage";
 import VideoDetailPage from "./src/components/page/VideoDetailPage";
 import VideoListPage from "./src/components/page/VideoListPage";
-import TestAPIPage from "./src/components/page/TestAPIPage";
+// import TestAPIPage from "./src/components/page/TestAPIPage";
 import ProductListTestPage from "./src/components/page/ProductListTestPage";
 
 const Stack = createStackNavigator();
@@ -18,7 +18,7 @@ const TabNavigator = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen name="VideoList" component={VideoListPage} />
-      <Tab.Screen name="ProductList" component={ProductListPage} />
+      <Tab.Screen name="WishlistPage" component={WishlistPage} />
       <Tab.Screen name="Highlight" component={HighlightPage} />
       <Tab.Screen name="Cart" component={CartPage} />
       <Tab.Screen name="ProductListTest" component={ProductListTestPage} />
@@ -37,7 +37,7 @@ const App = () => {
         />
         <Stack.Screen name="VideoDetail" component={VideoDetailPage} />
         <Stack.Screen name="Highlight" component={HighlightPage} />
-        <Stack.Screen name="Products" component={ProductListPage} />
+        <Stack.Screen name="WishlistPage" component={WishlistPage} />
         <Stack.Screen name="Cart" component={CartPage} />
         <Stack.Screen name="ProductListTest" component={ProductListTestPage} />
       </Stack.Navigator>
