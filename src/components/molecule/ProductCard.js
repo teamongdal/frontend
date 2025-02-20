@@ -15,12 +15,13 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.15;
 const CARD_HEIGHT = CARD_WIDTH * (251 / 188);
 
-const ProductCard = ({ data, onPress }) => {
+const ProductCard = ({ data, onPress, isActive }) => {
   return (
     <TouchableOpacity onPress={() => onPress(data)}>
-      <View style={styles.card}>
+      <View style={[styles.card, isActive && styles.active]}>
         {/* 상품 이미지 */}
         <Image source={{ uri: data.product_images[0] }} style={styles.image} />
+        <View style={styles.overlay} />
 
         {/* 정보 영역 */}
         <View style={styles.textContainer}>
@@ -43,19 +44,26 @@ const ProductCard = ({ data, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
+    left: 30,
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: 15,
+    borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "flex-end",
-    padding: 10,
+    margin: 10,
+  },
+  active: {
+    borderWidth: 4,
+    borderColor: "#a11a32",
   },
   image: {
     width: "100%",
     height: "100%",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, // 부모(Card) 전체를 덮도록 설정
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // 반투명 검은색 배경
     position: "absolute",
-    resizeMode: "cover",
   },
   textContainer: {
     position: "absolute",
@@ -63,7 +71,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     left: 10,
     right: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   brand: {
     fontSize: 12,
@@ -81,7 +88,7 @@ const styles = StyleSheet.create({
   },
   discount: {
     fontSize: 14,
-    color: "red",
+    color: "#FF82A3",
     fontWeight: "bold",
     marginRight: 5,
   },
