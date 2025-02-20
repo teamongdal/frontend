@@ -13,6 +13,7 @@ import ViewShot, { captureRef } from "react-native-view-shot";
 import { useNavigation } from "@react-navigation/native";
 import { Audio } from "expo-av";
 import axios from "axios";
+import ProductListTestPage from "../page/ProductListTestPage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -27,6 +28,8 @@ const VideoDetailPage = ({ route }) => {
   const navigation = useNavigation();
   const [recording, setRecording] = useState(null);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [productListVisible, setProductListVisible] = useState(false);
+  const [productList, setProductList] = useState([]);
 
   useEffect(() => {
     if (!videoId) return;
@@ -46,7 +49,7 @@ const VideoDetailPage = ({ route }) => {
   const handleClickSearch = () => {
     if (videoRef.current) {
       videoRef.current.pause();
-      setIsPlaying(() => (isPlaying ? !isPlaying : isPlaying));
+      setIsPlaying((prev) => !prev);
     }
 
     startRecording();
@@ -107,9 +110,13 @@ const VideoDetailPage = ({ route }) => {
     sendAudioToServer(uri);
   }
 
+  const closeProductList = () => {
+    console.log("close 클릭");
+    setProductListVisible(false);
+    setIsPlaying((prev) => !prev);
+  };
   const sendAudioToServer = async (uri) => {
     try {
-      let fileBlob = null;
       const formData = new FormData();
 
       const imageFile = Image.resolveAssetSource(
@@ -130,15 +137,40 @@ const VideoDetailPage = ({ route }) => {
         type: fileType,
       });
 
-      const response = await axios.post(
+      // 첫 번째 API 호출 (음성 데이터 전송)
+      const searchResponse = await fetch(
         "http://127.0.0.1:8000/api/search_product?user_id=user_0001",
-        formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      console.log("Response from server:", response.data);
+      if (!searchResponse.ok) {
+        throw new Error(`서버 응답 오류: ${searchResponse.status}`);
+      }
+
+      const searchData = await searchResponse.json();
+      console.log("searchData".searchData);
+
+      const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
+
+      // 두 번째 API 호출 (상품 리스트 요청)
+      const productResponse = await fetch(
+        `http://127.0.0.1:8000/api/product_list?user_id=user_0001&product_code=${productId}`
+      );
+
+      if (!productResponse.ok) {
+        throw new Error(`상품 목록 응답 오류: ${productResponse.status}`);
+      }
+
+      const productData = await productResponse.json();
+      console.log("data.product_list", productData.product_list);
+      setProductList(productData.product_list);
+      setProductListVisible(true);
     } catch (error) {
       console.error(
         "Error sending audio:",
@@ -178,7 +210,7 @@ const VideoDetailPage = ({ route }) => {
           />
         )}
       </ViewShot>
-      {!loading && !isPlaying && (
+      {!isPlaying && (
         <View>
           <View style={{ flexDirection: "row" }}>
             {/* <Button
@@ -200,13 +232,15 @@ const VideoDetailPage = ({ route }) => {
               클릭 후 찾고 싶은 옷 정보를 알려주세요
             </Text>
           </TouchableOpacity>
-          {/* {capturedImage && (
-            <Image
-              source={{ uri: capturedImage }}
-              style={styles.capturedImage}
-            />
-          )} */}
         </View>
+      )}
+      {productListVisible && productList && (
+        <ProductListTestPage
+          productList={productList}
+          productListVisible={productListVisible}
+          closeProductList={closeProductList}
+          onRequestClose={closeProductList}
+        ></ProductListTestPage>
       )}
     </View>
   );
