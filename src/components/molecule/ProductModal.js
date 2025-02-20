@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   View,
@@ -12,8 +12,46 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import ProductCarousel from "../molecule/ProductCarousel";
 
 const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
-
+const API_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
 const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
+  const [isLike, setIsLike] = useState(null);
+
+  useEffect(() => {
+    if (selectedProduct && selectedProduct.is_like !== undefined) {
+      console.log("selectedProduct: ", selectedProduct);
+      setIsLike(selectedProduct.is_like);
+    }
+  }, [selectedProduct]); // selectedProduct가 변경될 때 실행
+
+  const handleClickLike = async () => {
+    try {
+      if (!selectedProduct || !selectedProduct.product_code) {
+        throw new Error("제품 정보가 없습니다.");
+      }
+
+      const action = isLike ? "product_unlike" : "product_like";
+      const response = await fetch(
+        `${API_URL}/api/${action}?user_id=user_0001&product_code=${selectedProduct.product_code}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`서버 응답 실패: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("API 응답 데이터:", data);
+
+      setIsLike(!isLike); // 상태 반대로 변경
+    } catch (error) {
+      console.error("좋아요 실패:", error);
+    }
+  };
   return (
     <View>
       {/* 모달 */}
@@ -52,7 +90,9 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                 <Text style={styles.brandName}>
                   {selectedProduct.brand_name}
                 </Text>
-                <Text style={styles.rating}>⭐ {selectedProduct.rating}</Text>
+                <Text style={styles.rating}>
+                  ⭐ {selectedProduct.rating ?? 4.2}
+                </Text>
               </View>
               {/* 상품 정보 */}
               <View>
@@ -65,7 +105,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
 
                 {/* 가격 및 할인율 */}
                 <View style={styles.priceContainer}>
-                  {selectedProduct.discount_rate !== "0%" && (
+                  {selectedProduct.discount_rate !== "0" && (
                     <Text style={styles.discount}>
                       {selectedProduct.discount_rate}
                     </Text>
@@ -103,8 +143,15 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
 
                 {/* 하트 아이콘 & 확인 버튼 */}
                 <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.heartButton}>
-                    <Icon name="heart" size={22} color="#fff" />
+                  <TouchableOpacity
+                    style={styles.heartButton}
+                    onPress={handleClickLike}
+                  >
+                    <Icon
+                      name={"heart"}
+                      size={22}
+                      color={isLike ? "#a11a32" : "gray"}
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.confirmButton}>
                     <Text style={styles.confirmButtonText}>확인</Text>
@@ -263,9 +310,7 @@ const styles = {
     marginTop: 15,
   },
   heartButton: {
-    backgroundColor: "#a11a32",
     padding: 10,
-    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
     width: 50,
