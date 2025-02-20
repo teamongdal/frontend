@@ -19,8 +19,6 @@ const VideoListPage = () => {
   const navigation = useNavigation();
   const [videoList, setVideoList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const thumbnail =
-    "https://image.tving.com/ntgs/contents/CTC/caip/CAIP0900/ko/20240329/0100/P001754312.jpg/dims/resize/480";
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/video_list?user_id=user_0001`)
@@ -76,7 +74,10 @@ const VideoListPage = () => {
               onPress={() => handleClickVideoItem(data.video_id)}
             >
               <View style={styles.card}>
-                <Image source={{ uri: thumbnail }} style={styles.image} />
+                <Image
+                  source={{ uri: data.video_image.replace(/^C:\//, "/") }}
+                  style={styles.image}
+                />
                 <View style={styles.textContainer}>
                   <Text style={styles.text}>{data.video_name}</Text>
                 </View>
