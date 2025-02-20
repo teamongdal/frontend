@@ -31,7 +31,18 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
               {/*이미지 캐러셀*/}
-              <ProductCarousel images={selectedProduct.product_images} />
+              {<Text>{selectedProduct.product_images.length}</Text>}
+              {selectedProduct.product_images.filter((image) => {
+                image != "없음";
+              }) > 1 ? (
+                <ProductCarousel images={selectedProduct.product_images} />
+              ) : (
+                <Image
+                  source={{ uri: selectedProduct.product_images[0] }}
+                  style={styles.productImage}
+                />
+              )}
+
               {/* 브랜드 로고 & 이름 */}
               <View style={styles.brandContainer}>
                 <Image
@@ -166,7 +177,7 @@ const styles = {
   },
   productImage: {
     width: "100%",
-    height: width * 0.42,
+    height: width * 0.35,
     borderRadius: 10,
     resizeMode: "cover",
   },
