@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   Switch,
   StyleSheet,
   Dimensions,
-  ScrollView,
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 48) / 2;
 
 const WishlistPage = () => {
@@ -22,6 +22,9 @@ const WishlistPage = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [productCodeList, setProductCodeList] = useState([]);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const flatListRef = useRef(null); // FlatList 참조
 
   const API_URL = "http://127.0.0.1:8000";
 
@@ -77,7 +80,11 @@ const WishlistPage = () => {
         : [...prevList, productCode]
     );
   };
-
+  const scrollToTop = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
+    }
+  };
   const deleteSelectedItems = async () => {
     if (deleteItemList.length === 0) {
       alert("삭제할 상품을 선택하세요.");
@@ -137,13 +144,14 @@ const WishlistPage = () => {
         </TouchableOpacity>
       </View>
 
-      {/* 위시리스트 그리드 */}
+      {/*위시리스트 그리드*/}
       <FlatList
+        ref={flatListRef}
         data={cartItems.filter((item) =>
-          isFilterEnabled ? cartItems.includes(item.id) : true
+          isFilterEnabled ? deleteItemList.includes(item.product_code) : true
         )}
         numColumns={2}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => "wish" + item.product_code}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <View
@@ -173,13 +181,26 @@ const WishlistPage = () => {
                 {item.review_rating ?? item.review_rating == "없음"
                   ? 0
                   : item.review_rating}
-                ({item.review_cnt ?? 0})
+                (
+                {item.review_cnt ?? item.review_rating == "없음"
+                  ? 0
+                  : item.review_rating}
+                )
               </Text>
               <Text style={styles.heart}>❤️ {item.heart_cnt ?? 0}</Text>
             </View>
           </View>
         )}
+        onScroll={(event) => {
+          const offsetY = event.nativeEvent.contentOffset.y;
+          setShowScrollTop(offsetY > height * 0.3); // 일정 높이 이상 내려가면 버튼 표시
+        }}
       />
+      {showScrollTop && (
+        <TouchableOpacity style={styles.floatingButton} onPress={scrollToTop}>
+          <Icon name="arrow-up" size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -233,6 +254,19 @@ const styles = StyleSheet.create({
   },
   rating: { fontSize: 12, color: "#666" },
   heart: { fontSize: 12, color: "#FF4D4D" },
+  floatingButton: {
+    position: "absolute",
+    bottom: 30,
+    right: 20,
+    backgroundColor: "#FF4D4D",
+    padding: 15,
+    borderRadius: 50,
+    elevation: 5, // Android 그림자
+    shadowColor: "#000", // iOS 그림자
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
 });
 
 export default WishlistPage;
