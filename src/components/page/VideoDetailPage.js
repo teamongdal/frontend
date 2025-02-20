@@ -30,6 +30,7 @@ const VideoDetailPage = ({ route }) => {
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [productListVisible, setProductListVisible] = useState(false);
   const [productList, setProductList] = useState([]);
+  const [showSearchButtons, setShowSearchButtons] = useState(false);
 
   useEffect(() => {
     if (!videoId) return;
@@ -49,9 +50,8 @@ const VideoDetailPage = ({ route }) => {
   const handleClickSearch = () => {
     if (videoRef.current) {
       videoRef.current.pause();
-      setIsPlaying((prev) => !prev);
+      setIsPlaying(false);
     }
-
     startRecording();
   };
 
@@ -66,7 +66,6 @@ const VideoDetailPage = ({ route }) => {
         playsInSilentModeIOS: true,
       });
 
-      console.log("Starting recording..");
       const recording = new Audio.Recording();
       await recording.prepareToRecordAsync({
         isMeteringEnabled: false,
@@ -90,8 +89,6 @@ const VideoDetailPage = ({ route }) => {
 
       await recording.startAsync();
       setRecording(recording);
-      console.log("Recording started");
-
       handleCapture();
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -99,40 +96,41 @@ const VideoDetailPage = ({ route }) => {
   }
 
   async function stopRecording() {
-    console.log("Stopping recording..");
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
     });
     const uri = recording.getURI();
-    console.log("Recording stopped and stored at", uri);
+    // console.log("Recording stopped and stored at", uri);
+
     sendAudioToServer(uri);
+    setShowSearchButtons(false);
   }
 
   const closeProductList = () => {
     console.log("close 클릭");
     setProductListVisible(false);
-    setIsPlaying((prev) => !prev);
+    setIsPlaying(true);
   };
-  const sendAudioToServer = async (uri) => {
+  const sendAudioToServer = async (audioUri) => {
     try {
       const formData = new FormData();
 
-      const imageFile = Image.resolveAssetSource(
-        require("../../assets/video/highlight_0001_0001.png")
-      ).uri;
+      // const imageFile = Image.resolveAssetSource(
+      //   require("../../assets/video/highlight_0001_0001.png")
+      // ).uri;
 
       // 이미지 파일 추가
       formData.append("image", {
-        uri: imageFile,
+        uri: capturedImage,
         name: "captured_image.png",
         type: "image/png",
       });
 
-      const fileType = uri.endsWith(".wav") ? "audio/wav" : "audio/m4a"; // iOS의 경우 확장자 확인
+      const fileType = audioUri.endsWith(".wav") ? "audio/wav" : "audio/m4a"; // iOS의 경우 확장자 확인
       formData.append("audio", {
-        uri: uri.startsWith("file://") ? uri : `file://${uri}`,
+        uri: audioUri.startsWith("file://") ? audioUri : `file://${audioUri}`,
         name: `recorded_audio.${fileType === "audio/wav" ? "wav" : "m4a"}`, // iOS 확장자 확인
         type: fileType,
       });
@@ -154,7 +152,7 @@ const VideoDetailPage = ({ route }) => {
       }
 
       const searchData = await searchResponse.json();
-      console.log("searchData".searchData);
+      console.log("searchData", searchData);
 
       const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
 
@@ -171,6 +169,7 @@ const VideoDetailPage = ({ route }) => {
       console.log("data.product_list", productData.product_list);
       setProductList(productData.product_list);
       setProductListVisible(true);
+      setIsPlaying(false);
     } catch (error) {
       console.error(
         "Error sending audio:",
@@ -207,10 +206,11 @@ const VideoDetailPage = ({ route }) => {
             isPlaying={isPlaying}
             videoUrl={videoData.video_url}
             videoName={videoData.video_name}
+            setShowSearchButtons={setShowSearchButtons}
           />
         )}
       </ViewShot>
-      {!isPlaying && (
+      {showSearchButtons && (
         <View>
           <View style={{ flexDirection: "row" }}>
             {/* <Button
