@@ -9,7 +9,7 @@ import WishlistPage from "./src/components/page/WishlistPage";
 import VideoDetailPage from "./src/components/page/VideoDetailPage";
 import VideoListPage from "./src/components/page/VideoListPage";
 // import TestAPIPage from "./src/components/page/TestAPIPage";
-import ProductListTestPage from "./src/components/page/ProductListTestPage";
+import ProductListTest2Page from "./src/components/page/ProductListTest2Page";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -21,7 +21,7 @@ const TabNavigator = () => {
       <Tab.Screen name="WishlistPage" component={WishlistPage} />
       <Tab.Screen name="Highlight" component={HighlightPage} />
       {/* <Tab.Screen name="Cart" component={CartPage} /> */}
-      <Tab.Screen name="ProductListTest" component={ProductListTestPage} />
+      <Tab.Screen name="ProductListTest2" component={ProductListTest2Page} />
     </Tab.Navigator>
   );
 };
@@ -39,7 +39,10 @@ const App = () => {
         <Stack.Screen name="Highlight" component={HighlightPage} />
         <Stack.Screen name="WishlistPage" component={WishlistPage} />
         {/* <Stack.Screen name="Cart" component={CartPage} /> */}
-        <Stack.Screen name="ProductListTest" component={ProductListTestPage} />
+        <Stack.Screen
+          name="ProductListTest2"
+          component={ProductListTest2Page}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
