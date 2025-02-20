@@ -32,6 +32,8 @@ const WishlistPage = () => {
     setProductCodeList(cartItems.map((item) => item.product_code));
   }, [cartItems]);
 
+  const rules = [3.1, 2.1, 1, 1.2, 3, 1.4, 2, 1.1, 1.9, 1.6];
+
   useEffect(() => {
     if (
       deleteItemList.length > 0 &&
@@ -40,7 +42,6 @@ const WishlistPage = () => {
     ) {
       setSelectAll(true);
     }
-    console.log("deleteItemList: ", deleteItemList);
   }, [deleteItemList]);
   useEffect(() => {
     fetch(`${API_URL}/api/cart_list?user_id=user_0001`)
@@ -102,7 +103,6 @@ const WishlistPage = () => {
         .then((response) => response.json())
         .then((data) => {
           setCartItems(data.cart_list);
-          console.log("API 응답 데이터:", data);
         })
         .catch((error) => console.error("API 요청 실패:", error));
     } catch (error) {
@@ -179,15 +179,21 @@ const WishlistPage = () => {
               <Text style={styles.rating}>
                 ⭐
                 {item.review_rating ?? item.review_rating == "없음"
-                  ? 0
+                  ? Math.floor(
+                      rules[item.product_code[item.product_code.length - 1]] + 1
+                    ) + 0.5
                   : item.review_rating}
                 (
                 {item.review_cnt ?? item.review_rating == "없음"
-                  ? 0
+                  ? 1
                   : item.review_rating}
                 )
               </Text>
-              <Text style={styles.heart}>❤️ {item.heart_cnt ?? 0}</Text>
+              <Text style={styles.heart}>
+                ❤️
+                {item.heart_cnt ??
+                  rules[item.product_code[item.product_code.length - 1]] + "k"}
+              </Text>
             </View>
           </View>
         )}

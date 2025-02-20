@@ -229,9 +229,7 @@ const VideoDetailPage = ({ route }) => {
                 source={require("../../assets/unvoice.png")}
                 style={styles.micButton}
               />
-              <Text style={styles.buttonStopText}>
-                녹음 종료을 종료합니다."
-              </Text>
+              <Text style={styles.buttonStopText}>녹음을 종료합니다."</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -290,7 +288,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 30,
     fontWeight: "bold",
-    left: -50,
+    left: -30,
     marginTop: 10,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     padding: 10,
