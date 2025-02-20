@@ -38,7 +38,7 @@ const ProductListTestPage = ({
       animationType="slide"
       transparent={true}
       visible={productListVisible}
-      onRequestClose={closeModal}
+      onRequestClose={closeProductList}
     >
       <View style={styles.container}>
         <Text style={styles.title}>N 시리즈</Text>
@@ -61,13 +61,14 @@ const ProductListTestPage = ({
             유사한 제품을 추천해 드릴게요
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {productList?.map((product) => (
+            {productList?.map((product, idx) => (
               <ProductCard
                 data={product}
                 onPress={() => {
                   setSelectedProduct(product);
                   setModalVisible(true);
                 }}
+                key={idx}
               />
             ))}
           </ScrollView>
