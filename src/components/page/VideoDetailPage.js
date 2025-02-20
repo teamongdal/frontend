@@ -178,27 +178,35 @@ const VideoDetailPage = ({ route }) => {
           />
         )}
       </ViewShot>
-      <View style={{ flexDirection: "row" }}>
-        {/* <Button
+      {!loading && !isPlaying && (
+        <View>
+          <View style={{ flexDirection: "row" }}>
+            {/* <Button
           title="녹음 시작"
           onPress={startRecording}
           disabled={!!recording}
         /> */}
-        <Button
-          title="녹음 종료"
-          onPress={stopRecording}
-          disabled={!recording}
-        />
-      </View>
-      <TouchableOpacity
-        style={styles.captureButton}
-        onPress={handleClickSearch}
-      >
-        <Text style={styles.buttonText}>유사상품 찾기</Text>
-      </TouchableOpacity>
-
-      {capturedImage && (
-        <Image source={{ uri: capturedImage }} style={styles.capturedImage} />
+            <Button
+              title="녹음 종료"
+              onPress={stopRecording}
+              disabled={!recording}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.captureButton}
+            onPress={handleClickSearch}
+          >
+            <Text style={styles.buttonText}>
+              클릭 후 찾고 싶은 옷 정보를 알려주세요
+            </Text>
+          </TouchableOpacity>
+          {/* {capturedImage && (
+            <Image
+              source={{ uri: capturedImage }}
+              style={styles.capturedImage}
+            />
+          )} */}
+        </View>
       )}
     </View>
   );

@@ -71,6 +71,12 @@ const VideoDetailPage = ({ route }) => {
     console.log("share~");
   };
 
+  const timeline = [
+    { seconds: 4, frames: 20 }, // 4초 20프레임 (4*24 + 20 = 116프레임)
+    { seconds: 10, frames: 0 }, // 10초 0프레임 (10*24 + 0 = 240프레임)
+    { seconds: 15, frames: 18 }, // 15초 18프레임 (15*24 + 18 = 378프레임)
+  ];
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{videoData?.video_name}</Text>
@@ -81,6 +87,9 @@ const VideoDetailPage = ({ route }) => {
             ref={videoRef}
             videoUrl={videoData.video_url}
             videoName={videoData.video_name}
+            setIsPlaying={setIsPlaying}
+            isPlaying={isPlaying}
+            timeline={timeline}
           />
         )}
       </ViewShot>
