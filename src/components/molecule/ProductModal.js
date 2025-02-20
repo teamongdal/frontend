@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  TouchableWithoutFeedback,
   Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -14,6 +15,7 @@ import ProductCarousel from "../molecule/ProductCarousel";
 const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
 const API_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
 const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
+  const rules = [3.1, 2.1, 1, 1.2, 3, 1.4, 2, 1.1, 1.9, 1.6];
   const [isLike, setIsLike] = useState(null);
 
   useEffect(() => {
@@ -62,104 +64,125 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              {/* 닫기 버튼 */}
-              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                <Text style={styles.closeButtonText}>✕</Text>
-              </TouchableOpacity>
-              {/*이미지 캐러셀*/}
-              {<Text>{selectedProduct.product_images.length}</Text>}
-              {selectedProduct.product_images.filter((image) => {
-                image != "없음";
-              }) > 1 ? (
-                <ProductCarousel images={selectedProduct.product_images} />
-              ) : (
-                <Image
-                  source={{ uri: selectedProduct.product_images[0] }}
-                  style={styles.productImage}
-                />
-              )}
+          <TouchableWithoutFeedback
+            onPress={() => {
+              if (selectedProduct) {
+                closeModal(); // 바깥을 클릭하면 닫힘
+              }
+            }}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                {/* 닫기 버튼 */}
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={closeModal}
+                >
+                  <Text style={styles.closeButtonText}>✕</Text>
+                </TouchableOpacity>
+                {/*이미지 캐러셀*/}
+                {<Text>{selectedProduct.product_images.length}</Text>}
+                {selectedProduct.product_images.filter(
+                  (image) => image !== "없음" // "없음"을 제외
+                ).length > 1 ? (
+                  <ProductCarousel images={selectedProduct.product_images} />
+                ) : (
+                  <Image
+                    source={{ uri: selectedProduct.product_images[0] }}
+                    style={styles.productImage}
+                  />
+                )}
 
-              {/* 브랜드 로고 & 이름 */}
-              <View style={styles.brandContainer}>
-                <Image
-                  source={{ uri: selectedProduct.brand_image }}
-                  style={styles.brandImage}
-                />
-                <Text style={styles.brandName}>
-                  {selectedProduct.brand_name}
-                </Text>
-                <Text style={styles.rating}>
-                  ⭐ {selectedProduct.rating ?? 4.2}
-                </Text>
-              </View>
-              {/* 상품 정보 */}
-              <View>
-                <Text style={styles.categoryTag}>
-                  {selectedProduct.category}
-                </Text>
-                <Text style={styles.productName}>
-                  {selectedProduct.product_name}
-                </Text>
-
-                {/* 가격 및 할인율 */}
-                <View style={styles.priceContainer}>
-                  {selectedProduct.discount_rate !== "0" && (
-                    <Text style={styles.discount}>
-                      {selectedProduct.discount_rate}
-                    </Text>
-                  )}
-                  <Text style={styles.price}>
-                    ₩ {selectedProduct.final_price}
+                {/* 브랜드 로고 & 이름 */}
+                <View style={styles.brandContainer}>
+                  <Image
+                    source={{ uri: selectedProduct.brand_image }}
+                    style={styles.brandImage}
+                  />
+                  <Text style={styles.brandName}>
+                    {selectedProduct.brand_name}
+                  </Text>
+                  <Text style={styles.rating}>
+                    ⭐{" "}
+                    {selectedProduct.review_rating ??
+                    selectedProduct.review_rating == "없음"
+                      ? Math.floor(
+                          rules[
+                            selectedProduct.product_code[
+                              selectedProduct.product_code.length - 1
+                            ]
+                          ] + 1
+                        ) + 0.5
+                      : selectedProduct.review_rating}
                   </Text>
                 </View>
-
-                {/* 찜(♥) 개수 & 카테고리 */}
-                <Text style={styles.heartCount}>
-                  ♥ {selectedProduct.heart_cnt} | {selectedProduct.category}
-                </Text>
-              </View>
-              {/* 리뷰 정보 */}
-              <View>
-                {/* Details 제목 */}
-                <Text style={styles.detailsTitle}>Details</Text>
-
-                {/* 설명 박스 */}
-                <View style={[styles.detailsBox]}>
-                  <Text style={styles.detailsText}>
-                    <Icon name="plus-circle" size={14} color="#fff" />{" "}
-                    <Text style={styles.detailsHighlight}>
-                      클래식과 트렌드의 완벽한 조화
-                    </Text>
+                {/* 상품 정보 */}
+                <View>
+                  <Text style={styles.categoryTag}>
+                    {selectedProduct.category}
                   </Text>
-                  <Text style={styles.detailsContent}>
-                    리바이스의 시그니처 트러커 재킷 디자인에 코듀로이 소재를
-                    더해 클래식하면서도 트렌디한 무드를 완성했습니다. 어떤
-                    스타일에도 쉽게 매치할 수 있어 데일리룩부터 캐주얼룩까지
-                    활용도가 높습니다.
+                  <Text style={styles.productName}>
+                    {selectedProduct.product_name}
+                  </Text>
+
+                  {/* 가격 및 할인율 */}
+                  <View style={styles.priceContainer}>
+                    {selectedProduct.discount_rate !== "0" && (
+                      <Text style={styles.discount}>
+                        {selectedProduct.discount_rate}
+                      </Text>
+                    )}
+                    <Text style={styles.price}>
+                      ₩ {selectedProduct.final_price}
+                    </Text>
+                  </View>
+
+                  {/* 찜(♥) 개수 & 카테고리 */}
+                  <Text style={styles.heartCount}>
+                    ♥ {selectedProduct.heart_cnt} | {selectedProduct.category}
                   </Text>
                 </View>
+                {/* 리뷰 정보 */}
+                <View>
+                  {/* Details 제목 */}
+                  <Text style={styles.detailsTitle}>Details</Text>
 
-                {/* 하트 아이콘 & 확인 버튼 */}
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity
-                    style={styles.heartButton}
-                    onPress={handleClickLike}
-                  >
-                    <Icon
-                      name={"heart"}
-                      size={22}
-                      color={isLike ? "#a11a32" : "gray"}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.confirmButton}>
-                    <Text style={styles.confirmButtonText}>확인</Text>
-                  </TouchableOpacity>
+                  {/* 설명 박스 */}
+                  <View style={[styles.detailsBox]}>
+                    <Text style={styles.detailsText}>
+                      <Icon name="plus-circle" size={14} color="#fff" />{" "}
+                      <Text style={styles.detailsHighlight}>
+                        클래식과 트렌드의 완벽한 조화
+                      </Text>
+                    </Text>
+                    <Text style={styles.detailsContent}>
+                      리바이스의 시그니처 트러커 재킷 디자인에 코듀로이 소재를
+                      더해 클래식하면서도 트렌디한 무드를 완성했습니다. 어떤
+                      스타일에도 쉽게 매치할 수 있어 데일리룩부터 캐주얼룩까지
+                      활용도가 높습니다.
+                    </Text>
+                  </View>
+
+                  {/* 하트 아이콘 & 확인 버튼 */}
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={styles.heartButton}
+                      onPress={handleClickLike}
+                    >
+                      <Icon
+                        name={"heart"}
+                        size={22}
+                        color={isLike ? "#a11a32" : "gray"}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.confirmButton}>
+                      <Text style={styles.confirmButtonText}>확인</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </Modal>
       )}
     </View>
@@ -171,16 +194,16 @@ const styles = {
   // 모달 오버레이 (반투명 배경)
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    // backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
     alignItems: "flex-end",
   },
 
   // 모달 컨텐츠 (오른쪽에서 나오는 스타일)
   modalContent: {
-    position: "absolute",
+    // position: "absolute",
     height: "100%",
-    width: "42%",
+    width: "30%",
     backgroundColor: "#1a1a1a",
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
@@ -195,7 +218,7 @@ const styles = {
     position: "absolute",
     top: 10,
     left: -30,
-    zIndex: 10,
+    // zIndex: 10,
   },
   closeButtonText: {
     fontSize: 24,
