@@ -10,18 +10,13 @@ import {
   Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { ProductModal } from "../molecule/modal/ProductModal";
+import ProductModal from "../molecule/ProductModal";
 // import Swiper from "react-native-swiper";
-import Icon from "react-native-vector-icons/FontAwesome"; // ✅ 아이콘 변경
-import ProductCarousel from "../molecule/ProductCarousel"; // ✅ 추가된 Carousel 컴포넌트 불러오기
 
 const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
 
 const ProductListTestPage = () => {
-  const carouselRef = useRef(null);
-
   const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
-  const navigation = useNavigation();
   const [productList, setProductList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,14 +26,6 @@ const ProductListTestPage = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
-
-  useEffect(() => {
-    console.log("selectedProduct", selectedProduct);
-  }, [selectedProduct]);
-
-  useEffect(() => {
-    console.log("productList: ", productList);
-  }, [productList]);
 
   useEffect(() => {
     if (!productId) return;
@@ -57,132 +44,47 @@ const ProductListTestPage = () => {
       });
   }, [productId]);
 
-  const handleClickProductItem = (data) => {
-    setSelectedProduct(data);
-    setModalVisible(true);
-  };
   return (
     <View style={styles.container}>
-      {/* 메인 컨텐츠 */}
-      <View style={styles.mainContent}>
-        <Text style={styles.headerTitle}>Google Play 무비</Text>
-        <Text style={styles.headerSubtitle}>TV에서 보면 더 커지는 즐거움!</Text>
-        <Text style={styles.headerSubtitle}>
-          Google이 제공하는 다양한 게임과 앱을 지금 만나보세요
-        </Text>
+      <Text style={styles.title}>N 시리즈</Text>
+      <Text style={styles.mainTitle}>솔로지옥</Text>
+      <Text style={styles.description}>
+        세 커플이 천국도로 향한다. 지금껏 숨겨온 주고받으며 더욱 가까워지는
+        솔로들.
+      </Text>
+      <TouchableOpacity style={styles.watchButton}>
+        <Text style={styles.watchButtonText}>▶ 이어서 시청</Text>
+      </TouchableOpacity>
 
-        {/* 컨텐츠 리스트 */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.scrollView}
-        >
-          {productList.map((data, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => handleClickProductItem(data)}
-            >
-              <View style={styles.card}>
-                <Image
-                  source={{ uri: data.product_images[0] }}
-                  style={styles.image}
-                />
-                <View style={styles.textContainer}>
-                  <Text style={styles.text}>{data.product_name}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-      {/* 모달 */}
-      {selectedProduct && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={closeModal}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              {/* 닫기 버튼 */}
-              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                <Text style={styles.closeButtonText}>✕</Text>
-              </TouchableOpacity>
-              {/*이미지 캐러셀*/}
-              <ProductCarousel images={selectedProduct.product_images} />
-              {/* 브랜드 로고 & 이름 */}
-              <View style={styles.brandContainer}>
-                <Image
-                  source={{ uri: selectedProduct.brand_image }}
-                  style={styles.brandImage}
-                />
-                <Text style={styles.brandName}>
-                  {selectedProduct.brand_name}
-                </Text>
-                <Text style={styles.rating}>⭐ {selectedProduct.rating}</Text>
-              </View>
-              {/* 상품 정보 */}
-              <View>
-                <Text style={styles.categoryTag}>
-                  {selectedProduct.category}
-                </Text>
-                <Text style={styles.productName}>
-                  {selectedProduct.product_name}
-                </Text>
-
-                {/* 가격 및 할인율 */}
-                <View style={styles.priceContainer}>
-                  {selectedProduct.discount_rate !== "0%" && (
-                    <Text style={styles.discount}>
-                      {selectedProduct.discount_rate}
-                    </Text>
-                  )}
-                  <Text style={styles.price}>
-                    ₩ {selectedProduct.final_price}
-                  </Text>
-                </View>
-
-                {/* 찜(♥) 개수 & 카테고리 */}
-                <Text style={styles.heartCount}>
-                  ♥ {selectedProduct.heart_cnt} | {selectedProduct.category}
-                </Text>
-              </View>
-              {/* 리뷰 정보 */}
-              <View>
-                {/* Details 제목 */}
-                <Text style={styles.detailsTitle}>Details</Text>
-
-                {/* 설명 박스 */}
-                <View style={[styles.detailsBox]}>
-                  <Text style={styles.detailsText}>
-                    <Icon name="plus-circle" size={14} color="#fff" />{" "}
-                    <Text style={styles.detailsHighlight}>
-                      클래식과 트렌드의 완벽한 조화
-                    </Text>
-                  </Text>
-                  <Text style={styles.detailsContent}>
-                    리바이스의 시그니처 트러커 재킷 디자인에 코듀로이 소재를
-                    더해 클래식하면서도 트렌디한 무드를 완성했습니다. 어떤
-                    스타일에도 쉽게 매치할 수 있어 데일리룩부터 캐주얼룩까지
-                    활용도가 높습니다.
-                  </Text>
-                </View>
-
-                {/* 하트 아이콘 & 확인 버튼 */}
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.heartButton}>
-                    <Icon name="heart" size={22} color="#fff" />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.confirmButton}>
-                    <Text style={styles.confirmButtonText}>확인</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+      <Text style={styles.recommendTitle}>유사한 제품을 추천해 드릴게요</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {productList.map((product) => (
+          <TouchableOpacity
+            key={product.id}
+            onPress={() => {
+              setSelectedProduct(product);
+              setModalVisible(true);
+            }}
+          >
+            <View style={styles.productCard}>
+              <Image
+                source={{ uri: product.product_images[0] }}
+                style={styles.productImage}
+              />
+              <Text style={styles.productName}>{product.name}</Text>
+              <Text style={styles.productPrice}>{product.price}</Text>
+              {product.discount && (
+                <Text style={styles.productDiscount}>{product.discount}</Text>
+              )}
             </View>
-          </View>
-        </Modal>
-      )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      <ProductModal
+        modalVisible={modalVisible}
+        closeModal={closeModal}
+        selectedProduct={selectedProduct}
+      />
     </View>
   );
 };
@@ -190,228 +92,68 @@ const ProductListTestPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row",
-    backgroundColor: "black",
-    padding: 16,
-  },
-  sidebar: {
-    width: width * 0.08,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 40,
-  },
-  icon: {
-    marginBottom: 20,
-  },
-  mainContent: {
-    flex: 1,
-    paddingLeft: 20,
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: width * 0.04,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    color: "gray",
-    fontSize: width * 0.018,
-    marginBottom: 4,
+    backgroundColor: "#000",
+    padding: 20,
   },
   title: {
-    color: "white",
-    fontSize: width * 0.03,
+    color: "red",
+    fontSize: 16,
     fontWeight: "bold",
-    marginVertical: 16,
   },
-  scrollView: {
-    flexDirection: "row",
-  },
-  card: {
-    width: width * 0.22,
-    height: width * 0.38,
-    marginRight: width * 0.03,
-    borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: "#222",
-  },
-  image: {
-    width: "100%",
-    height: "85%",
-    resizeMode: "cover",
-  },
-  textContainer: {
-    padding: 8,
-    alignItems: "center",
-  },
-  text: {
-    color: "white",
-    fontSize: width * 0.018,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  // 모달 오버레이 (반투명 배경)
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-  },
-
-  // 모달 컨텐츠 (오른쪽에서 나오는 스타일)
-  modalContent: {
-    position: "absolute",
-    height: "100%",
-    width: "42%",
-    backgroundColor: "#1a1a1a",
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
-    padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: -2, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    left: -30,
-    zIndex: 10,
-  },
-  closeButtonText: {
-    fontSize: 24,
+  mainTitle: {
     color: "#fff",
+    fontSize: 32,
+    fontWeight: "bold",
+    marginTop: 5,
   },
-  brandContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  description: {
+    color: "#ccc",
+    fontSize: 14,
+    marginVertical: 10,
+  },
+  watchButton: {
+    backgroundColor: "#e50914",
+    padding: 10,
+    borderRadius: 5,
+    alignSelf: "flex-start",
+    marginBottom: 20,
+  },
+  watchButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  recommendTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
     marginBottom: 10,
   },
-  brandImage: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+  productCard: {
+    backgroundColor: "#222",
+    padding: 10,
+    borderRadius: 8,
+    width: width * 0.4,
     marginRight: 10,
-  },
-  brandName: {
-    fontSize: 16,
-    color: "#fff",
-    fontWeight: "bold",
-    flex: 1,
-  },
-  rating: {
-    fontSize: 14,
-    color: "#ffd700",
   },
   productImage: {
     width: "100%",
-    height: width * 0.42,
-    borderRadius: 10,
-    resizeMode: "cover",
-  },
-  categoryTag: {
-    backgroundColor: "#444",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-    color: "#fff",
-    alignSelf: "flex-start",
-    marginBottom: 5,
+    height: 120,
+    borderRadius: 8,
   },
   productName: {
-    fontSize: 20,
-    fontWeight: "bold",
     color: "#fff",
-    marginBottom: 10,
-  },
-  priceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  discount: {
-    fontSize: 16,
-    color: "red",
-    fontWeight: "bold",
-    marginRight: 10,
-  },
-  price: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  colorContainer: {
-    flexDirection: "row",
-    marginBottom: 10,
-  },
-  colorCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    marginHorizontal: 5,
-    borderWidth: 1,
-    borderColor: "#fff",
-  },
-  heartCount: {
     fontSize: 14,
-    color: "#bbb",
-  },
-  detailsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
-  },
-  detailsBox: {
-    backgroundColor: "#292929",
-    padding: 15,
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  detailsText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 5,
-  },
-  detailsHighlight: {
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  detailsContent: {
-    fontSize: 18,
-    color: "#ddd",
-    lineHeight: 22,
     marginTop: 5,
   },
-
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 15,
-  },
-  heartButton: {
-    backgroundColor: "#a11a32",
-    padding: 10,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    width: 50,
-    height: 50,
-  },
-  confirmButton: {
-    flex: 1,
-    backgroundColor: "#a11a32",
-    padding: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginLeft: 10,
-  },
-  confirmButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
+  productPrice: {
     color: "#fff",
+    fontSize: 12,
+  },
+  productDiscount: {
+    color: "#e50914",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
 
