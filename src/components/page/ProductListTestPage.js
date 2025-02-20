@@ -41,18 +41,17 @@ const ProductListTestPage = ({
       onRequestClose={closeProductList}
     >
       <View style={styles.container}>
+        {/* 닫기 버튼 */}
+        <TouchableOpacity style={styles.closeButton} onPress={closeProductList}>
+          <Text style={styles.closeButtonText}>✕</Text>
+        </TouchableOpacity>
         <Text style={styles.title}>N 시리즈</Text>
         <Text style={styles.mainTitle}>솔로지옥</Text>
         <Text style={styles.description}>
           세 커플이 천국도로 향한다. 지금껏 숨겨온 주고받으며 더욱 가까워지는
           솔로들.
         </Text>
-        <TouchableOpacity
-          style={styles.watchButton}
-          onPress={() => {
-            closeProductList();
-          }}
-        >
+        <TouchableOpacity style={styles.watchButton} onPress={closeProductList}>
           <Text style={styles.watchButtonText}>▶ 이어서 시청</Text>
         </TouchableOpacity>
 
@@ -87,9 +86,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // position: "absolute",
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    // backgroundColor: "rgba(0, 0, 0, 0.3)",
     // backgroundColor: "#000",
     padding: 20,
+  },
+  closeButton: {
+    position: "absolute",
+    bottom: 10,
+    left: 0,
+    zIndex: 10,
+  },
+  closeButtonText: {
+    fontSize: 100,
+    color: "#fff",
   },
   title: {
     color: "red",
