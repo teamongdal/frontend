@@ -73,16 +73,18 @@ const ProductCarousel = ({ images }) => {
 
 const styles = StyleSheet.create({
   carouselContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+    // alignItems: "center",
+    // justifyContent: "center",
+    left: "23%",
   },
   productImage: {
-    width: width * 0.42,
+    width: width * 0.3,
     height: "100%",
     borderRadius: 10,
-    resizeMode: "cover",
-    position: "absolute",
-    left: 0,
+    // right: 0,
+    // resizeMode: "cover",
+    // position: "absolute",
+    // left: 0,
   },
   arrowLeft: {
     position: "absolute",
@@ -90,12 +92,14 @@ const styles = StyleSheet.create({
     zIndex: 10,
     // backgroundColor: "rgba(0, 0, 0, 0.4)",
     padding: 10,
+    top: "45%",
     // borderRadius: 20,
   },
   arrowRight: {
     position: "absolute",
-    right: 10,
+    right: 180,
     zIndex: 10,
+    top: "45%",
     // backgroundColor: "rgba(0, 0, 0, 0.4)",
     padding: 10,
     // borderRadius: 20,
@@ -104,6 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     position: "absolute",
     bottom: 10,
+    left: 180,
     alignSelf: "center",
   },
   dot: {

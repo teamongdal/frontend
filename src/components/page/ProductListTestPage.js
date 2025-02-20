@@ -21,17 +21,24 @@ const ProductListTestPage = ({
   productList,
   closeProductList,
   productListVisible,
+  videoName,
 }) => {
   const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
   // const [productList, setProductList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   const closeModal = () => {
     setModalVisible(false);
+    setActiveIdx(null);
   };
+
+  useEffect(() => {
+    setSelectedProduct(productList[0]);
+  }, []);
 
   return (
     <Modal
@@ -42,20 +49,34 @@ const ProductListTestPage = ({
     >
       <View style={styles.container}>
         {/* 닫기 버튼 */}
-        <TouchableOpacity style={styles.closeButton} onPress={closeProductList}>
+        {/* <TouchableOpacity style={styles.closeButton} onPress={closeProductList}>
           <Text style={styles.closeButtonText}>✕</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>N 시리즈</Text>
-        <Text style={styles.mainTitle}>솔로지옥</Text>
-        <Text style={styles.description}>
-          세 커플이 천국도로 향한다. 지금껏 숨겨온 주고받으며 더욱 가까워지는
-          솔로들.
-        </Text>
-        <TouchableOpacity style={styles.watchButton} onPress={closeProductList}>
-          <Text style={styles.watchButtonText}>▶ 이어서 시청</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.title}>N 시리즈</Text>
+          <Text style={styles.mainTitle}>{videoName}</Text>
+          <Text style={styles.description}>
+            {"7화 ・ 2025 드라마 ・ 시리즈"}
+          </Text>
+          <Text style={styles.description}>
+            세 커플이 천국도로 향한다. 지금껏 숨겨온 주고받으며 더욱 가까워지는
+            솔로들.
+          </Text>
+          <TouchableOpacity
+            style={styles.watchButton}
+            onPress={closeProductList}
+          >
+            <Text style={styles.watchButtonText}>▶ 이어서 시청</Text>
+          </TouchableOpacity>
+          {/* <TouchableOpacity
+            style={styles.watchButton}
+            onPress={closeProductList}
+          >
+            <Text style={styles.watchButtonText}>계속 재생하기</Text>
+          </TouchableOpacity> */}
+        </View>
 
-        <View style={{ paddingTop: "30%" }}>
+        <View style={{ paddingTop: "5%" }}>
           <Text style={styles.recommendTitle}>
             유사한 제품을 추천해 드릴게요
           </Text>
@@ -64,9 +85,12 @@ const ProductListTestPage = ({
               <ProductCard
                 data={product}
                 onPress={() => {
+                  console.log("click!");
                   setSelectedProduct(product);
                   setModalVisible(true);
+                  setActiveIdx(idx);
                 }}
+                isActive={idx == activeIdx}
                 key={idx}
               />
             ))}
@@ -85,8 +109,9 @@ const ProductListTestPage = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 300,
     // position: "absolute",
-    // backgroundColor: "rgba(0, 0, 0, 0.3)",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
     // backgroundColor: "#000",
     padding: 20,
   },
@@ -100,6 +125,9 @@ const styles = StyleSheet.create({
     fontSize: 100,
     color: "#fff",
   },
+  infoContainer: {
+    left: 50,
+  },
   title: {
     color: "red",
     fontSize: 16,
@@ -107,7 +135,7 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     color: "#fff",
-    fontSize: 32,
+    fontSize: 60,
     fontWeight: "bold",
     marginTop: 5,
   },
@@ -118,10 +146,14 @@ const styles = StyleSheet.create({
   },
   watchButton: {
     backgroundColor: "#e50914",
-    padding: 10,
-    borderRadius: 5,
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingLeft: 30,
+    paddingRight: 30,
+    borderRadius: 32,
     alignSelf: "flex-start",
     marginBottom: 20,
+    marginTop: 10,
   },
   watchButtonText: {
     color: "#fff",
@@ -130,9 +162,10 @@ const styles = StyleSheet.create({
   },
   recommendTitle: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 20,
+    paddingLeft: 50,
   },
   productCard: {
     backgroundColor: "#222",
@@ -156,7 +189,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   productDiscount: {
-    color: "#e50914",
+    color: "#FF82A3",
     fontSize: 12,
     fontWeight: "bold",
   },

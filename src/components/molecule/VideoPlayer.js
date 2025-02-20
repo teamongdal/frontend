@@ -10,8 +10,8 @@ const VideoPlayer = forwardRef(
     //video_0001 = 스카이캐슬
     const timeline = {
       video_0001: [
-        { seconds: 4, frames: 27 },
-        { seconds: 16, frames: 8 },
+        { seconds: 2, frames: 27 },
+        { seconds: 4, frames: 8 },
         { seconds: 38, frames: 26 },
       ],
       video_0002: [

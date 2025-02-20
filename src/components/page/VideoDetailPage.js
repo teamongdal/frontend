@@ -229,18 +229,18 @@ const VideoDetailPage = ({ route }) => {
                 source={require("../../assets/unvoice.png")}
                 style={styles.micButton}
               />
-              <Text style={styles.buttonStopText}>녹음을 종료합니다."</Text>
+              <Text style={styles.buttonStopText}>녹음을 종료합니다.</Text>
             </TouchableOpacity>
           )}
         </View>
       )}
-
       {productListVisible && productList && (
         <ProductListTestPage
           productList={productList}
           productListVisible={productListVisible}
           closeProductList={closeProductList}
           onRequestClose={closeProductList}
+          videoName={videoData?.video_name}
         ></ProductListTestPage>
       )}
     </View>
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   },
   captureButton: {
     position: "absolute",
-    bottom: 40,
+    bottom: -170,
     left: -100,
     padding: 12,
     borderRadius: 8,
@@ -294,12 +294,18 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   capturedImage: {
-    position: "absolute",
-    width: width * 0.5,
-    height: width * 0.3,
-    marginTop: 10,
+    width: 200,
+    height: 120,
+    marginTop: 20,
     borderRadius: 10,
   },
+  // capturedImage: {
+  //   position: "absolute",
+  //   width: width * 0.5,
+  //   height: width * 0.3,
+  //   marginTop: 10,
+  //   borderRadius: 10,
+  // },
 });
 
 export default VideoDetailPage;
