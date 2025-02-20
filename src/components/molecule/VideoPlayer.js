@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import Video from "react-native-video";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -6,41 +6,49 @@ import Icon from "react-native-vector-icons/FontAwesome";
 const { width } = Dimensions.get("window");
 
 const VideoPlayer = forwardRef(
-  ({ videoUrl, setIsPlaying, isPlaying, timeline }, ref) => {
-    // // 24fps 기준으로 프레임을 초 단위로 변환
-    // const convertToSeconds = (timeObj) => {
-    //   return timeObj.seconds + timeObj.frames / 24; // 1초 = 24프레임
-    // };
+  ({ videoUrl, setIsPlaying, isPlaying, setShowSearchButtons }, ref) => {
+    //video_0001 = 스카이캐슬
+    const timeline = {
+      video_0001: [
+        { seconds: 4, frames: 27 },
+        { seconds: 16, frames: 8 },
+        { seconds: 38, frames: 26 },
+      ],
+      video_0002: [
+        { seconds: 16, frames: 8 },
+        { seconds: 38, frames: 26 },
+        { seconds: 94, frames: 22 },
+        { seconds: 171, frames: 15 },
+      ],
+    };
 
+    // 초 + 프레임을 초 단위로 변환 (30fps 기준)
+    const convertToSeconds = (seconds, frames) => {
+      return seconds + frames / 30;
+    };
+
+    const videoKey = "video_0001";
+
+    const stopTimes = videoKey
+      ? timeline[videoKey].map(({ seconds, frames }) =>
+          convertToSeconds(seconds, frames)
+        )
+      : [];
+
+    const [curIdx, setCurIdx] = useState(0);
     // 현재 영상 시간 감지하여 특정 타임라인에 도달하면 멈춤
     const handleProgress = ({ currentTime }) => {
       const currentFrame = Math.round(currentTime * 24);
 
+      if (curIdx >= stopTimes.length) return;
+
       console.log("currentTime: ", currentTime, "currentFrame: ", currentFrame);
-      if (currentTime >= 4.83) {
+      if (currentTime >= stopTimes[curIdx]) {
         setIsPlaying(false);
+        setShowSearchButtons(true);
+        setCurIdx((prevIdx) => prevIdx + 1);
       }
     };
-
-    const convertFramesToSeconds = (seconds, frames) => {
-      return (seconds * 24 + frames) / 24;
-    };
-
-    const convertSecondsToFrames = (seconds, frames) => {
-      return seconds * 24 + frames;
-    };
-
-    const timeObj = { seconds: 4, frames: 20 };
-    const convertedTime = convertFramesToSeconds(
-      timeObj.seconds,
-      timeObj.frames
-    );
-
-    console.log(
-      `${timeObj.seconds}초 ${
-        timeObj.frames
-      }프레임은 약 ${convertedTime.toFixed(2)}초`
-    );
 
     return (
       <View style={styles.container}>
