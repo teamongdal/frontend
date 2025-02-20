@@ -102,7 +102,6 @@ const VideoDetailPage = ({ route }) => {
       allowsRecordingIOS: false,
     });
     const uri = recording.getURI();
-    // console.log("Recording stopped and stored at", uri);
 
     sendAudioToServer(uri);
     setShowSearchButtons(false);
@@ -116,10 +115,6 @@ const VideoDetailPage = ({ route }) => {
   const sendAudioToServer = async (audioUri) => {
     try {
       const formData = new FormData();
-
-      // const imageFile = Image.resolveAssetSource(
-      //   require("../../assets/video/highlight_0001_0001.png")
-      // ).uri;
 
       // 이미지 파일 추가
       formData.append("image", {
@@ -211,29 +206,37 @@ const VideoDetailPage = ({ route }) => {
         )}
       </ViewShot>
       {showSearchButtons && (
-        <View>
-          <View style={{ flexDirection: "row" }}>
-            {/* <Button
-          title="녹음 시작"
-          onPress={startRecording}
-          disabled={!!recording}
-        /> */}
-            <Button
-              title="녹음 종료"
+        <View style={{ flexDirection: "row" }}>
+          {recording == null ? (
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={handleClickSearch}
+            >
+              <Image
+                source={require("../../assets/voice.png")}
+                style={styles.micButton}
+              />
+              <Text style={styles.buttonText}>
+                클릭 후 찾고 싶은 옷 정보를 알려주세요
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.captureButton}
               onPress={stopRecording}
-              disabled={!recording}
-            />
-          </View>
-          <TouchableOpacity
-            style={styles.captureButton}
-            onPress={handleClickSearch}
-          >
-            <Text style={styles.buttonText}>
-              클릭 후 찾고 싶은 옷 정보를 알려주세요
-            </Text>
-          </TouchableOpacity>
+            >
+              <Image
+                source={require("../../assets/unvoice.png")}
+                style={styles.micButton}
+              />
+              <Text style={styles.buttonStopText}>
+                녹음 종료을 종료합니다."
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
+
       {productListVisible && productList && (
         <ProductListTestPage
           productList={productList}
@@ -263,14 +266,34 @@ const styles = StyleSheet.create({
   captureButton: {
     position: "absolute",
     bottom: 40,
-    backgroundColor: "#FF5733",
+    left: -100,
     padding: 12,
     borderRadius: 8,
   },
+  micButton: {
+    padding: 10,
+    width: 200,
+    height: 200,
+    backgroundColor: "white",
+    borderRadius: 100,
+  },
   buttonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 30,
     fontWeight: "bold",
+    left: -130,
+    marginTop: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: 10,
+  },
+  buttonStopText: {
+    color: "white",
+    fontSize: 30,
+    fontWeight: "bold",
+    left: -50,
+    marginTop: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: 10,
   },
   capturedImage: {
     position: "absolute",
