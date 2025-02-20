@@ -58,23 +58,25 @@ const ProductListTestPage = () => {
         <Text style={styles.watchButtonText}>▶ 이어서 시청</Text>
       </TouchableOpacity>
 
-      <Text style={styles.recommendTitle}>유사한 제품을 추천해 드릴게요</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {productList.map((product) => (
-          <ProductCard
-            data={product}
-            onPress={() => {
-              setSelectedProduct(product);
-              setModalVisible(true);
-            }}
-          />
-        ))}
-      </ScrollView>
-      <ProductModal
-        modalVisible={modalVisible}
-        closeModal={closeModal}
-        selectedProduct={selectedProduct}
-      />
+      <View style={{ paddingTop: "30%" }}>
+        <Text style={styles.recommendTitle}>유사한 제품을 추천해 드릴게요</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {productList.map((product) => (
+            <ProductCard
+              data={product}
+              onPress={() => {
+                setSelectedProduct(product);
+                setModalVisible(true);
+              }}
+            />
+          ))}
+        </ScrollView>
+        <ProductModal
+          modalVisible={modalVisible}
+          closeModal={closeModal}
+          selectedProduct={selectedProduct}
+        />
+      </View>
     </View>
   );
 };

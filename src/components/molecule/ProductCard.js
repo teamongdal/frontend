@@ -12,7 +12,7 @@ import {
 const { width } = Dimensions.get("window");
 
 // 카드 크기를 기기 너비에 맞게 조정 (iPad Pro 13인치 기준 188px → 비율 유지)
-const CARD_WIDTH = width * 0.25;
+const CARD_WIDTH = width * 0.15;
 const CARD_HEIGHT = CARD_WIDTH * (251 / 188);
 
 const ProductCard = ({ data, onPress }) => {
@@ -30,7 +30,7 @@ const ProductCard = ({ data, onPress }) => {
           </Text>
 
           <View style={styles.priceRow}>
-            {data.discount_rate !== "0%" && (
+            {data.discount_rate !== "0" && (
               <Text style={styles.discount}>{data.discount_rate}</Text>
             )}
             <Text style={styles.price}>₩ {data.final_price}</Text>
@@ -59,9 +59,11 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     position: "absolute",
-    bottom: 10,
+    paddingBottom: 10,
+    paddingTop: 10,
     left: 10,
     right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   brand: {
     fontSize: 12,
