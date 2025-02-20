@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProductModal from "../molecule/ProductModal";
+import ProductCard from "../molecule/ProductCard";
+
 // import Swiper from "react-native-swiper";
 
 const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
@@ -59,25 +61,13 @@ const ProductListTestPage = () => {
       <Text style={styles.recommendTitle}>유사한 제품을 추천해 드릴게요</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {productList.map((product) => (
-          <TouchableOpacity
-            key={product.id}
+          <ProductCard
+            data={product}
             onPress={() => {
               setSelectedProduct(product);
               setModalVisible(true);
             }}
-          >
-            <View style={styles.productCard}>
-              <Image
-                source={{ uri: product.product_images[0] }}
-                style={styles.productImage}
-              />
-              <Text style={styles.productName}>{product.name}</Text>
-              <Text style={styles.productPrice}>{product.price}</Text>
-              {product.discount && (
-                <Text style={styles.productDiscount}>{product.discount}</Text>
-              )}
-            </View>
-          </TouchableOpacity>
+          />
         ))}
       </ScrollView>
       <ProductModal
