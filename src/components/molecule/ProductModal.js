@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Pressable,
+  TouchableWithoutFeedback,
   Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -64,7 +64,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <Pressable
+          <TouchableWithoutFeedback
             onPress={() => {
               if (selectedProduct) {
                 closeModal(); // 바깥을 클릭하면 닫힘
@@ -214,7 +214,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                 </View>
               </View>
             </View>
-          </Pressable>
+          </TouchableWithoutFeedback>
         </Modal>
       )}
     </View>
@@ -283,9 +283,17 @@ const styles = {
     fontSize: 14,
     color: "#ffd700",
   },
+  // productImage: {
+  //   width: "100%",
+  //   height: width * 0.35,
+  //   borderRadius: 10,
+  //   resizeMode: "cover",
+  // },
   productImage: {
     width: width * 0.3,
     height: height * 0.4,
+    // width: width * 0.3,
+    // height: "100%",
   },
   categoryTag: {
     backgroundColor: "#444",
