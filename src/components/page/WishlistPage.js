@@ -34,6 +34,17 @@ const WishlistPage = () => {
 
   const rules = [3.1, 2.1, 1, 1.2, 3, 1.4, 2, 1.1, 1.9, 1.6];
 
+  const CustomCheckbox = ({ isChecked, onToggle }) => {
+    return (
+      <TouchableOpacity
+        style={[styles.checkbox, isChecked && styles.checked]}
+        onPress={onToggle}
+      >
+        {isChecked && <Icon name="check" size={14} color="#FFF" />}
+      </TouchableOpacity>
+    );
+  };
+
   useEffect(() => {
     if (
       deleteItemList.length > 0 &&
@@ -113,35 +124,45 @@ const WishlistPage = () => {
   return (
     <View style={styles.container}>
       {/* 헤더 */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity>
           <Text style={styles.backButton}>{"<"}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>위시 리스트</Text>
-      </View>
+      </View> */}
 
       {/* 전체 선택 & 필터 */}
       <View style={styles.filterContainer}>
-        <View>
+        <View style={styles.checkboxContainer}>
           <CheckBox
+            style={[styles.checkboxWrap, styles.bigCheckbox]}
             value={selectAll && deleteItemList.length == cartItems.length}
             onValueChange={toggleSelectAll}
           />
-          <Text>{"전체"}</Text>
+          <Text style={{ left: 26, fontWeight: "bold", paddingTop: 2 }}>
+            {"전체"}
+          </Text>
         </View>
 
         <View style={styles.toggleContainer}>
-          <Text>선택 상품만 보기</Text>
+          <Text style={styles.grayText}>선택 상품만 보기</Text>
           <Switch
             value={isFilterEnabled}
             onValueChange={toggleFilter}
-            trackColor={{ false: "#ccc", true: "#FF4D4D" }}
+            trackColor={{ false: "#ccc", true: "#830023" }}
           />
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: "#E8E8E8",
+              height: "14",
+              gap: 8,
+            }}
+          ></View>
+          <TouchableOpacity onPress={deleteSelectedItems}>
+            <Text style={styles.grayText}>선택 삭제</Text>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity onPress={deleteSelectedItems}>
-          <Text style={styles.deleteButton}>선택 삭제</Text>
-        </TouchableOpacity>
       </View>
 
       {/*위시리스트 그리드*/}
@@ -160,40 +181,63 @@ const WishlistPage = () => {
               cartItems.includes(item.id) && styles.selectedItem,
             ]}
           >
-            <CheckBox
-              value={deleteItemList.includes(item.product_code)}
-              onValueChange={() => toggleItemSelection(item.product_code)}
-            />
-            {/* 제품 이미지 */}
-            <Image source={{ uri: item.product_image }} style={styles.image} />
+            {/* 이미지 안에 체크박스 배치 */}
+            <View style={styles.imageWrapper}>
+              <Image
+                source={{ uri: item.product_image }}
+                style={styles.image}
+              />
+              <CheckBox
+                value={deleteItemList.includes(item.product_code)}
+                onValueChange={() => toggleItemSelection(item.product_code)}
+                style={styles.checkboxWrap}
+              />
+            </View>
             {/* 브랜드명 */}
             <Text style={styles.brand}>{item.brand_name}</Text>
             {/* 제품명 */}
             <Text style={styles.productName}>{item.product_name}</Text>
             {/* 가격 & 할인율 */}
             <View style={styles.priceContainer}>
+              <Text style={styles.discount}>
+                {item.discount_rate == 0 ? "" : item.discount_rate}
+              </Text>
               <Text style={styles.price}>{item.final_price}</Text>
             </View>
             {/* 평점 & 좋아요 */}
+            {/* 평점 & 좋아요 */}
             <View style={styles.ratingContainer}>
-              <Text style={styles.rating}>
-                ⭐
-                {item.review_rating ?? item.review_rating == "없음"
-                  ? Math.floor(
-                      rules[item.product_code[item.product_code.length - 1]] + 1
-                    ) + 0.5
-                  : item.review_rating}
-                (
-                {item.review_cnt ?? item.review_rating == "없음"
-                  ? 1
-                  : item.review_rating}
-                )
-              </Text>
-              <Text style={styles.heart}>
-                ❤️
-                {item.heart_cnt ??
-                  rules[item.product_code[item.product_code.length - 1]] + "k"}
-              </Text>
+              {/* 평점 */}
+              <View style={styles.ratingWrapper}>
+                <Image
+                  source={require("../../assets/icon-star.png")}
+                  style={styles.icon}
+                />
+                <Text style={styles.rating}>
+                  {item.review_rating ?? item.review_rating == "없음"
+                    ? Math.floor(
+                        rules[item.product_code[item.product_code.length - 1]] +
+                          1
+                      ) + 0.5
+                    : item.review_rating}
+                  (
+                  {item.review_cnt ??
+                    (item.review_cnt == "없음" ? 1 : item.review_cnt)}
+                  ) <Text style={{ gap: 4 }}>{" ・ "}</Text>
+                </Text>
+                {/* 좋아요 */}
+                <View style={styles.heartWrapper}>
+                  <Image
+                    source={require("../../assets/icon-heart.png")}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.heart}>
+                    {item.heart_cnt ??
+                      rules[item.product_code[item.product_code.length - 1]] +
+                        "k"}
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         )}
@@ -204,7 +248,12 @@ const WishlistPage = () => {
       />
       {showScrollTop && (
         <TouchableOpacity style={styles.floatingButton} onPress={scrollToTop}>
-          <Icon name="arrow-up" size={24} color="#fff" />
+          <Icon
+            name="angle-up"
+            size={24}
+            color="#fff"
+            style={{ left: 10, top: 4 }}
+          />
         </TouchableOpacity>
       )}
     </View>
@@ -233,45 +282,103 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: "space-between",
   },
-  // selectAll: { fontSize: 14, fontWeight: "bold" },
-  toggleContainer: { flexDirection: "row", alignItems: "center", gap: 8 },
-  deleteButton: { color: "gray", fontSize: 14 },
+  checkboxContainer: {
+    textAlign: "center",
+  },
+  toggleContainer: { flexDirection: "row", alignItems: "center", gap: 4 },
+  grayText: { color: "#898D99", fontSize: 13 },
   listContainer: { paddingHorizontal: 12, paddingBottom: 20 },
   itemContainer: {
     width: ITEM_WIDTH,
     margin: 6,
-    padding: 10,
-    backgroundColor: "#F8F8F8",
     borderRadius: 10,
     position: "relative",
   },
-  selectedItem: { borderWidth: 2, borderColor: "#FF4D4D" },
-  checkbox: { position: "absolute", top: 10, left: 10 },
-  image: { width: "100%", height: 180, borderRadius: 8 },
-  brand: { fontSize: 12, color: "gray", marginTop: 5 },
-  productName: { fontSize: 14, fontWeight: "bold", marginVertical: 4 },
-  priceContainer: { flexDirection: "row", alignItems: "center", gap: 5 },
-  discount: { color: "red", fontWeight: "bold" },
+  imageWrapper: {
+    position: "relative",
+  },
+  image: {
+    width: "100%",
+    height: 209,
+    borderRadius: 8,
+  },
+  selectedItem: { borderWidth: 2, borderColor: "#830023" },
+  checkboxWrap: {
+    position: "absolute",
+    top: -200,
+    left: 10,
+    width: 16,
+    height: 16,
+  },
+  bigCheckbox: {
+    width: 20,
+    height: 20,
+    top: 0,
+    left: 0,
+    // transform: [{ scale: 0.9 }], // 체크박스 크기 조절
+  },
+  image: { width: "100%", height: 209, borderRadius: 8 },
+  brand: { fontSize: 12, color: "#898D99", marginTop: 12 },
+  productName: {
+    fontSize: 13,
+    marginVertical: 4,
+    minHeight: 31,
+    alignItems: "center",
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 4,
+  },
+  discount: {
+    fontWeight: "bold",
+    color: "#FF2B2F",
+    fontSize: 12,
+  },
   price: { fontWeight: "bold", fontSize: 16 },
   ratingContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "row", // 가로 정렬
+    justifyContent: "space-between", // 좌우 배치
+    alignItems: "center", // 수직 정렬
     marginTop: 4,
+    marginBottom: 16,
   },
-  rating: { fontSize: 12, color: "#666" },
-  heart: { fontSize: 12, color: "#FF4D4D" },
+
+  ratingWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  heartWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  icon: {
+    width: 12,
+    height: 12,
+    marginRight: 4, // 아이콘과 텍스트 사이 간격 추가
+  },
+
+  rating: {
+    fontSize: 12,
+    color: "#1C1F33",
+  },
+
+  heart: {
+    fontSize: 12,
+    color: "#1C1F33",
+  },
+
   floatingButton: {
     position: "absolute",
     bottom: 30,
     right: 20,
-    backgroundColor: "#FF4D4D",
-    padding: 15,
+    backgroundColor: "#1C1F33",
+    width: 36,
+    height: 36,
     borderRadius: 50,
-    elevation: 5, // Android 그림자
-    shadowColor: "#000", // iOS 그림자
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
   },
 });
 
