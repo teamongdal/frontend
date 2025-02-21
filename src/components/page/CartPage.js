@@ -9,8 +9,9 @@ import {
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import ProductInfo from "../molecule/ProductInfo";
+import { server_url } from "../../api/function";
 
-const API_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
+const API_URL = server_url; // 백엔드 서버 주소
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);

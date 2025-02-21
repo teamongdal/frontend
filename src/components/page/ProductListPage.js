@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import { server_url } from "../../api/function";
 
 const ProductListPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,7 +33,7 @@ const ProductListPage = () => {
   ];
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/product_list?user_id=user_0001`)
+    fetch(`${server_url}/api/product_list?user_id=user_0001`)
       .then((response) => response.json())
       .then((data) => {
         console.log("API 응답 데이터:", data);

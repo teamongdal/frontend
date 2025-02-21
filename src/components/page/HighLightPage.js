@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, FlatList } from "react-native";
 import ProductInfo from "../molecule/ProductInfo";
+import { server_url } from "../../api/function";
 
 const renderItem = ({ item }) => {
   return (
@@ -23,14 +24,12 @@ const HighlightScreen = () => {
   const [highlightData, setHighlightData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const SERVER_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
-
   useEffect(() => {
     console.log("highlightData: ", highlightData);
   }, [highlightData]);
 
   useEffect(() => {
-    fetch(`${SERVER_URL}/api/all_product_list?video_id=video_0001`)
+    fetch(`${server_url}/api/all_product_list?video_id=video_0001`)
       .then((response) => response.json())
       .then((data) => {
         console.log("data: ", data);

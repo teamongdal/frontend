@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { server_url } from "../../api/function";
 
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 48) / 2;
@@ -25,8 +26,6 @@ const WishlistPage = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const flatListRef = useRef(null); // FlatList 참조
-
-  const API_URL = "http://127.0.0.1:8000";
 
   useEffect(() => {
     setProductCodeList(cartItems.map((item) => item.product_code));
@@ -55,7 +54,7 @@ const WishlistPage = () => {
     }
   }, [deleteItemList]);
   useEffect(() => {
-    fetch(`${API_URL}/api/cart_list?user_id=user_0001`)
+    fetch(`${server_url}/api/cart_list?user_id=user_0001`)
       .then((response) => response.json())
       .then((data) => {
         setCartItems(data.cart_list || []);

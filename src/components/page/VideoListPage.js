@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
-
+import { server_url } from "../../api/function";
 const { width } = Dimensions.get("window"); // 화면 크기 가져오기
 
 const sideIcons = ["gift", "gamepad", "star", "home", "film", "smile-o"];
@@ -21,7 +21,8 @@ const VideoListPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/video_list?user_id=user_0001`)
+    // fetch(`http://127.0.0.1:8000/api/video_list?user_id=user_0001`)
+    fetch(`${server_url}/api/video_list?user_id=user_0001`)
       .then((response) => response.json())
       .then((data) => {
         console.log("API 응답 데이터:", data);

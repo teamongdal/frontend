@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import AudioRecord from "react-native-audio-record";
 import io from "socket.io-client";
+import { server_url } from "../../api/function";
+
 import RNFS from "react-native-fs";
 
 const VoicePage = () => {
-  const SERVER_URL = "http://127.0.0.1:8000/"; // 백엔드 서버 주소
-
   const [transcription, setTranscription] = useState(""); // 변환된 텍스트
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,7 @@ const VoicePage = () => {
   // }, []);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/video_play?video_id=video_0001`)
+    fetch(`${server_url}/api/video_play?video_id=video_0001`)
       .then((response) => response.json())
       .then(() => setLoading(false))
       .catch((error) => {

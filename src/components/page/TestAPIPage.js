@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { View, Button, Text, StyleSheet, Platform, Image } from "react-native";
 import { Audio } from "expo-av";
+import { server_url } from "../../api/function";
 
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
@@ -100,7 +101,7 @@ const TestAPIPage = () => {
       }
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/search_product?user_id=user_0001",
+        `${server_url}/api/search_product?user_id=user_0001`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

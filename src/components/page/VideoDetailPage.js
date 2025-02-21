@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Audio } from "expo-av";
 import axios from "axios";
 import ProductListTestPage from "../page/ProductListTestPage";
+import { server_url } from "../../api/function";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,11 +32,13 @@ const VideoDetailPage = ({ route }) => {
   const [productListVisible, setProductListVisible] = useState(false);
   const [productList, setProductList] = useState([]);
   const [showSearchButtons, setShowSearchButtons] = useState(false);
-
+  useEffect(() => {
+    console.log("videoData", videoData);
+  }, [videoData]);
   useEffect(() => {
     if (!videoId) return;
 
-    fetch(`http://127.0.0.1:8000/api/video_play?video_id=${videoId}`)
+    fetch(`${server_url}/api/video_play?video_id=${videoId}`)
       .then((response) => response.json())
       .then((data) => {
         setVideoData(data);

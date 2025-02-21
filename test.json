@@ -1,0 +1,51 @@
+{
+  "brand_image": "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/recommendations/images/brand_images/calvinkleinjeans.png",
+  "brand_name": "캘빈클라인 진",
+  "category": "아우터",
+  "category_sub": "카디건",
+  "discount_rate": "42%",
+  "final_price": "115,350원",
+  "heart_cnt": "153",
+  "is_like": false,
+  "numof_views": "500회 이상 (최근 1개월)",
+  "product_code": "cardigan_0128",
+  "product_images": [
+    "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/recommendations/images/product_images/cardigan_0128_00.jpg",
+    "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/recommendations/images/product_images/cardigan_0128_01.jpg",
+    "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/recommendations/images/product_images/cardigan_0128_02.jpg",
+    "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/recommendations/images/product_images/cardigan_0128_03.jpg"
+  ],
+  "product_name": "여성 브이넥 립 가디건 J225419 P41",
+  "product_price": "199,000원",
+  "review_cnt": "후기 1개",
+  "review_rating": "없음",
+  "reviews": [
+    "너무 따뜻하고 기본으로 딱 입기 좋은 가디건이라 추천합니다",
+    "없음",
+    "없음",
+    "없음",
+    "없음"
+  ],
+  "total_sales": "없음",
+  "cart_list": {
+    "brand_image": "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/recommendations/images/brand_images/trillion.png",
+    "brand_name": "트릴리온",
+    "category": "아우터",
+    "category_sub": "슈트/블레이저 재킷",
+    "detail_url": "https://www.musinsa.com/products/4514116",
+    "final_price": "54,000원",
+    "product_code": "blazer_0044",
+    "product_name": "스웨이드 엘보우 패치 3 버튼 블레이저 자켓 [브라운]"
+  },
+  "all_product_list": [
+    {
+      "brand_name": "무신사 스탠다드",
+      "final_price": "99,900원",
+      "highlight_idx": 1,
+      "highlight_image_url": "C:/Users/ongdal/local_data/highlight_image/highlight_0001_0001.png",
+      "product_code": "musinsa_blazer_0001",
+      "product_image_url  ": "/Users/ongdal/local_data/product_combined_images/musinsa_blazer_0001_01.jpg",
+      "product_name": "휩코드 릴렉스드 블레이저 [그레이쉬 베이지]"
+    }
+  ]
+}

@@ -12,6 +12,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import ProductModal from "../molecule/ProductModal";
 import ProductCard from "../molecule/ProductCard";
+import { server_url } from "../../api/function";
 
 const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
 
@@ -31,7 +32,7 @@ const ProductListTestPage = () => {
     if (!productId) return;
 
     fetch(
-      `http://127.0.0.1:8000/api/product_list?user_id=user_0001&product_code=${productId}`
+      `${server_url}/api/product_list?user_id=user_0001&product_code=${productId}`
     )
       .then((response) => response.json())
       .then((data) => {

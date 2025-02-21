@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, Button, Text, StyleSheet } from "react-native";
 import AudioRecorderPlayer from "react-native-audio-recorder-player";
 import { Platform } from "react-native";
+import { server_url } from "../../api/function";
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 

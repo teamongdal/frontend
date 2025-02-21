@@ -12,6 +12,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import ProductModal from "../molecule/ProductModal";
 import ProductCard from "../molecule/ProductCard";
+import { server_url } from "../../api/function";
 
 // import Swiper from "react-native-swiper";
 
