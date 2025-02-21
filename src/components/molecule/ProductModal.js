@@ -78,7 +78,8 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                   style={styles.closeButton}
                   onPress={closeModal}
                 >
-                  <Text style={styles.closeButtonText}>✕</Text>
+                  <Icon name="times" size={16} color="#ff82a3" />
+                  {/* <Text style={styles.closeButtonText}>✕</Text> */}
                 </TouchableOpacity>
                 {/*이미지 캐러셀*/}
                 {<Text>{selectedProduct.product_images.length}</Text>}
@@ -93,31 +94,49 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                   />
                 )}
 
-                {/* 브랜드 로고 & 이름 */}
-                <View style={styles.brandContainer}>
-                  <Image
-                    source={{ uri: selectedProduct.brand_image }}
-                    style={styles.brandImage}
-                  />
-                  <Text style={styles.brandName}>
-                    {selectedProduct.brand_name}
-                  </Text>
-                  <Text style={styles.rating}>
-                    ⭐{" "}
-                    {selectedProduct.review_rating ??
-                    selectedProduct.review_rating == "없음"
-                      ? Math.floor(
-                          rules[
-                            selectedProduct.product_code[
-                              selectedProduct.product_code.length - 1
-                            ]
-                          ] + 1
-                        ) + 0.5
-                      : selectedProduct.review_rating}
-                  </Text>
-                </View>
-                {/* 상품 정보 */}
-                <View>
+                <View style={styles.infoContainer}>
+                  {/* 브랜드 로고 & 이름 */}
+                  <View style={styles.brandContainer}>
+                    {selectedProduct.brand_imag && (
+                      <Image
+                        source={{ uri: selectedProduct.brand_image }}
+                        style={styles.brandImage}
+                      />
+                    )}
+
+                    <Text style={styles.brandName}>
+                      {selectedProduct.brand_name}
+                    </Text>
+                    <Text style={styles.rating}>
+                      ⭐
+                      {selectedProduct.review_rating ??
+                      selectedProduct.review_rating == "없음"
+                        ? Math.floor(
+                            rules[
+                              selectedProduct.product_code[
+                                selectedProduct.product_code.length - 1
+                              ]
+                            ] + 1
+                          ) + 0.5
+                        : selectedProduct.review_rating}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      borderWidth: 1,
+                      borderColor: "gray",
+                      width: "auto",
+                      shadowColor: "#000",
+                      shadowOffset: { width: -2, height: 0 },
+                      shadowOpacity: 0.08,
+                      shadowRadius: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}
+                  ></View>
+
+                  {/* 상품 정보 */}
                   <Text style={styles.categoryTag}>
                     {selectedProduct.category}
                   </Text>
@@ -129,7 +148,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                   <View style={styles.priceContainer}>
                     {selectedProduct.discount_rate !== "0" && (
                       <Text style={styles.discount}>
-                        {selectedProduct.discount_rate}
+                        {selectedProduct.discount_rate + "%"}
                       </Text>
                     )}
                     <Text style={styles.price}>
@@ -137,20 +156,33 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                     </Text>
                   </View>
 
-                  {/* 찜(♥) 개수 & 카테고리 */}
-                  <Text style={styles.heartCount}>
-                    ♥ {selectedProduct.heart_cnt} | {selectedProduct.category}
-                  </Text>
+                  {/* 찜(♥) 개수 */}
+                  {/* <Text style={styles.heartCount}>
+                    ♥ {selectedProduct.heart_cnt}
+                  </Text> */}
                 </View>
+
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    width: "100%",
+                    shadowColor: "#000",
+                    shadowOffset: { width: -2, height: 0 },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 10,
+                  }}
+                ></View>
+
                 {/* 리뷰 정보 */}
-                <View>
+                <View styles={styles.reviewContainer}>
                   {/* Details 제목 */}
                   <Text style={styles.detailsTitle}>Details</Text>
 
                   {/* 설명 박스 */}
                   <View style={[styles.detailsBox]}>
                     <Text style={styles.detailsText}>
-                      <Icon name="plus-circle" size={14} color="#fff" />{" "}
+                      <Icon name="plus-circle" size={14} color="#fff" />
                       <Text style={styles.detailsHighlight}>
                         클래식과 트렌드의 완벽한 조화
                       </Text>
@@ -171,7 +203,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                     >
                       <Icon
                         name={"heart"}
-                        size={22}
+                        size={25}
                         color={isLike ? "#a11a32" : "gray"}
                       />
                     </TouchableOpacity>
@@ -201,13 +233,9 @@ const styles = {
 
   // 모달 컨텐츠 (오른쪽에서 나오는 스타일)
   modalContent: {
-    // position: "absolute",
     height: "100%",
     width: "30%",
     backgroundColor: "#1a1a1a",
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
-    padding: 20,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: -2, height: 0 },
@@ -216,13 +244,22 @@ const styles = {
   },
   closeButton: {
     position: "absolute",
-    top: 10,
-    left: -30,
-    // zIndex: 10,
+    top: 16,
+    left: -46,
+    borderWidth: 1,
+    borderColor: "gray",
+    padding: 8,
+    borderRadius: 50,
   },
   closeButtonText: {
     fontSize: 24,
     color: "#fff",
+  },
+  infoContainer: {
+    padding: 16,
+    // left: -70,
+    marginTop: 12,
+    width: "100%",
   },
   brandContainer: {
     flexDirection: "row",
@@ -230,8 +267,8 @@ const styles = {
     marginBottom: 10,
   },
   brandImage: {
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     borderRadius: 15,
     marginRight: 10,
   },
@@ -239,26 +276,34 @@ const styles = {
     fontSize: 16,
     color: "#fff",
     fontWeight: "bold",
+    width: 316,
     flex: 1,
   },
   rating: {
     fontSize: 14,
     color: "#ffd700",
   },
+  // productImage: {
+  //   width: "100%",
+  //   height: width * 0.35,
+  //   borderRadius: 10,
+  //   resizeMode: "cover",
+  // },
   productImage: {
-    width: "100%",
-    height: width * 0.35,
-    borderRadius: 10,
-    resizeMode: "cover",
+    width: width * 0.3,
+    height: height * 0.4,
+    // width: width * 0.3,
+    // height: "100%",
   },
   categoryTag: {
     backgroundColor: "#444",
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 5,
+    borderRadius: 20,
     color: "#fff",
     alignSelf: "flex-start",
-    marginBottom: 5,
+    marginBottom: 12,
+    marginTop: 12,
   },
   productName: {
     fontSize: 20,
@@ -269,11 +314,11 @@ const styles = {
   priceContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 18,
   },
   discount: {
     fontSize: 16,
-    color: "red",
+    color: "#ff82a3",
     fontWeight: "bold",
     marginRight: 10,
   },
@@ -298,15 +343,21 @@ const styles = {
     fontSize: 14,
     color: "#bbb",
   },
+  reviewContainer: {
+    margin: 16,
+  },
   detailsTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
     marginBottom: 10,
+    marginTop: 16,
+    marginLeft: 16,
   },
   detailsBox: {
+    margin: 16,
     backgroundColor: "#292929",
-    padding: 15,
+    padding: 16,
     borderRadius: 10,
     overflow: "hidden",
   },
@@ -314,9 +365,12 @@ const styles = {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
-    marginBottom: 5,
+    marginBottom: 14,
+    marginTop: 12,
+    lineHeight: 18,
   },
   detailsHighlight: {
+    marginTop: 10,
     fontWeight: "bold",
     color: "#fff",
   },

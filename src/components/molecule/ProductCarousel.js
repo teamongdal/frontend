@@ -31,7 +31,7 @@ const ProductCarousel = ({ images }) => {
     <View style={styles.carouselContainer}>
       {/* 왼쪽 화살표 버튼 */}
       <TouchableOpacity style={styles.arrowLeft} onPress={handlePrev}>
-        <Icon name="angle-left" size={24} color="#ff6680" />
+        <Icon name="angle-left" size={20} color="#ff82a3" />
       </TouchableOpacity>
 
       {/* 이미지 캐러셀 */}
@@ -52,7 +52,7 @@ const ProductCarousel = ({ images }) => {
 
       {/* 오른쪽 화살표 버튼 */}
       <TouchableOpacity style={styles.arrowRight} onPress={handleNext}>
-        <Icon name="angle-right" size={24} color="#ff6680" />
+        <Icon name="angle-right" size={20} color="#ff82a3" />
       </TouchableOpacity>
 
       {/* Bullets 페이지네이션 */}
@@ -62,7 +62,7 @@ const ProductCarousel = ({ images }) => {
             key={index}
             style={[
               styles.dot,
-              { backgroundColor: index === currentIndex ? "#ff6680" : "#777" },
+              { backgroundColor: index === currentIndex ? "#830023" : "#777" },
             ]}
           />
         ))}
@@ -73,36 +73,25 @@ const ProductCarousel = ({ images }) => {
 
 const styles = StyleSheet.create({
   carouselContainer: {
-    // alignItems: "center",
-    // justifyContent: "center",
     left: "23%",
   },
   productImage: {
     width: width * 0.3,
     height: "100%",
-    borderRadius: 10,
-    // right: 0,
-    // resizeMode: "cover",
-    // position: "absolute",
-    // left: 0,
   },
   arrowLeft: {
     position: "absolute",
     left: 10,
     zIndex: 10,
-    // backgroundColor: "rgba(0, 0, 0, 0.4)",
     padding: 10,
     top: "45%",
-    // borderRadius: 20,
   },
   arrowRight: {
     position: "absolute",
     right: 180,
     zIndex: 10,
     top: "45%",
-    // backgroundColor: "rgba(0, 0, 0, 0.4)",
     padding: 10,
-    // borderRadius: 20,
   },
   pagination: {
     flexDirection: "row",
