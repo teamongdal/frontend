@@ -31,6 +31,7 @@ const VideoDetailPage = ({ route }) => {
   const [productListVisible, setProductListVisible] = useState(false);
   const [productList, setProductList] = useState([]);
   const [showSearchButtons, setShowSearchButtons] = useState(false);
+  const [isContinue, setIsContinue] = useState(true);
   useEffect(() => {
     console.log("videoData", videoData);
   }, [videoData]);
@@ -230,6 +231,10 @@ const VideoDetailPage = ({ route }) => {
           closeProductList={closeProductList}
           onRequestClose={closeProductList}
           videoName={videoData?.video_name}
+          isContinue={isContinue}
+          setIsContinue={setIsContinue}
+          setIsPlaying={setIsPlaying}
+          isPlaying={isPlaying}
         ></ProductListTestPage>
       )}
     </View>
