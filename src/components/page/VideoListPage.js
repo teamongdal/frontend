@@ -47,7 +47,7 @@ const VideoListPage = () => {
           <Icon
             key={index}
             name={icon}
-            size={width * 0.035}
+            size={width * 0.025}
             color="gray"
             style={styles.icon}
           />
@@ -99,13 +99,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sidebar: {
-    width: width * 0.08, // 반응형 크기 조정
+    width: width * 0.03,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 40, // 상단에서 너무 가까운 경우 조정
+    paddingVertical: 40,
   },
   icon: {
-    marginBottom: 20, // 아이콘 간격 조정
+    marginVertical: 20,
   },
   mainContent: {
     flex: 1,

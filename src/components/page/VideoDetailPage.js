@@ -14,6 +14,7 @@ import { Audio } from "expo-av";
 import ProductListTestPage from "../page/ProductListTestPage";
 import { server_url } from "../../api/function";
 import LoadingScreen from "../../components/molecule/LoadingBar";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,10 +32,18 @@ const VideoDetailPage = ({ route }) => {
   const [productListVisible, setProductListVisible] = useState(false);
   const [productList, setProductList] = useState([]);
   const [showSearchButtons, setShowSearchButtons] = useState(false);
-  const [isContinue, setIsContinue] = useState(true);
+  const [showControls, setShowControls] = useState(true);
+
   useEffect(() => {
     console.log("videoData", videoData);
   }, [videoData]);
+
+  useEffect(() => {
+    if (productListVisible) {
+      setIsPlaying(productListVisible);
+    }
+  }, [productListVisible]);
+
   useEffect(() => {
     if (!videoId) return;
 
@@ -112,7 +121,9 @@ const VideoDetailPage = ({ route }) => {
   const closeProductList = () => {
     console.log("close 클릭");
     setProductListVisible(false);
-    setIsPlaying(true);
+    if (!isPlaying) {
+      setIsPlaying(true);
+    }
   };
   const sendAudioToServer = async (audioUri) => {
     try {
@@ -152,7 +163,6 @@ const VideoDetailPage = ({ route }) => {
 
       setProductList(searchData.product_list);
       setProductListVisible(true);
-      setIsPlaying(false);
       setIsLoading(false);
     } catch (error) {
       console.error(
@@ -175,26 +185,52 @@ const VideoDetailPage = ({ route }) => {
       console.error("캡처 실패:", error);
     }
   };
+  // 화면 터치 시 버튼 보이게 하기
+  const handleScreenPress = () => {
+    setShowControls(true);
+  };
 
   return (
     <View style={styles.container}>
-      <ViewShot
-        ref={viewShotRef}
-        options={{ format: "jpg", quality: 0.9 }}
-        style={styles.videoContainer}
+      <TouchableOpacity
+        activeOpacity={1}
+        style={styles.container}
+        onPress={handleScreenPress} // 영상 터치 시 버튼 다시 보이기
       >
-        {videoData && (
-          <VideoPlayer
-            ref={videoRef}
-            setIsPlaying={setIsPlaying}
-            isPlaying={isPlaying}
-            videoUrl={videoData.video_url}
-            videoName={videoData.video_name}
-            setShowSearchButtons={setShowSearchButtons}
-          />
+        <ViewShot
+          ref={viewShotRef}
+          options={{ format: "jpg", quality: 0.9 }}
+          style={styles.videoContainer}
+        >
+          {videoData && (
+            <VideoPlayer
+              ref={videoRef}
+              productListVisible={productListVisible}
+              setIsPlaying={setIsPlaying}
+              isPlaying={isPlaying}
+              videoUrl={videoData.video_url}
+              videoName={videoData.video_name}
+              setShowSearchButtons={setShowSearchButtons}
+              setShowControls={setShowControls}
+              showControls={showControls}
+            />
+          )}
+        </ViewShot>
+
+        {/* Play/Pause 버튼 (showControls 상태에 따라 표시) */}
+        {showControls && (
+          <TouchableOpacity
+            style={[
+              styles.playPauseButton,
+              productListVisible ? styles.smallView : "",
+            ]}
+            onPress={() => setIsPlaying((prev) => !prev)}
+          >
+            <Icon name={isPlaying ? "pause" : "play"} size={30} color="white" />
+          </TouchableOpacity>
         )}
-      </ViewShot>
-      {showSearchButtons && (
+      </TouchableOpacity>
+      {showSearchButtons && !productListVisible && (
         <View style={{ flexDirection: "row" }}>
           {recording == null ? (
             <TouchableOpacity
@@ -231,8 +267,6 @@ const VideoDetailPage = ({ route }) => {
           closeProductList={closeProductList}
           onRequestClose={closeProductList}
           videoName={videoData?.video_name}
-          isContinue={isContinue}
-          setIsContinue={setIsContinue}
           setIsPlaying={setIsPlaying}
           isPlaying={isPlaying}
         ></ProductListTestPage>
@@ -257,8 +291,8 @@ const styles = StyleSheet.create({
   },
   captureButton: {
     position: "absolute",
-    bottom: -170,
-    left: -100,
+    bottom: "20%",
+    left: "-8%",
     padding: 12,
     borderRadius: 8,
   },
@@ -292,6 +326,20 @@ const styles = StyleSheet.create({
     height: 120,
     marginTop: 20,
     borderRadius: 10,
+  },
+  playPauseButton: {
+    position: "absolute",
+    top: "35%",
+    left: "50%",
+    transform: [{ translateX: -30 }],
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 15,
+    borderRadius: 50,
+    alignItems: "center",
+  },
+  smallView: {
+    top: "25%",
+    left: "35%",
   },
 });
 
