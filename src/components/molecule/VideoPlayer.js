@@ -10,9 +10,11 @@ const VideoPlayer = forwardRef(
     //video_0001 = 스카이캐슬
     const timeline = {
       video_0001: [
-        { seconds: 2, frames: 27 },
-        { seconds: 4, frames: 8 },
-        { seconds: 38, frames: 26 },
+        { seconds: 1, frames: 1 },
+        { seconds: 2, frames: 1 },
+        { seconds: 3, frames: 1 },
+        { seconds: 15, frames: 1 },
+        { seconds: 23, frames: 25 },
       ],
       video_0002: [
         { seconds: 16, frames: 8 },
@@ -54,13 +56,14 @@ const VideoPlayer = forwardRef(
       <View style={styles.container}>
         <Video
           ref={ref}
-          source={{ uri: videoUrl }}
+          source={{
+            uri: "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/vod/vod_our_E10_1.mp4",
+          }}
           style={styles.video}
           resizeMode="cover"
           paused={!isPlaying}
           onProgress={handleProgress}
         />
-
         {/* Play/Pause 버튼 */}
         {/* <TouchableOpacity
           style={styles.playPauseButton}
