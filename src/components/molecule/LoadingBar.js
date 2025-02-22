@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
+    zIndex: 1200,
   },
   overlay: {
     width: "100%",
