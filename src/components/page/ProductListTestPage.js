@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,15 +7,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  Modal,
 } from "react-native";
 import ProductModal from "../molecule/ProductModal";
 import ProductCard from "../molecule/ProductCard";
-import { server_url } from "../../api/function";
 
-// import Swiper from "react-native-swiper";
-
-const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
+const { width, height } = Dimensions.get("window");
 
 const ProductListTestPage = ({
   productList,
@@ -25,21 +21,18 @@ const ProductListTestPage = ({
   setIsPlaying,
   isPlaying,
 }) => {
-  const [modalVisible, setModalVisible] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeIdx, setActiveIdx] = useState(0);
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setActiveIdx(null);
-  };
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     setSelectedProduct(productList[0]);
   }, []);
 
-  const toggleFilter = () => {
-    setIsContinue((prev) => !prev);
+  const closeModal = () => {
+    setModalVisible(false);
+    setActiveIdx(null);
+    setIsPlaying(true);
   };
 
   // const toggleFilter = async () => {
@@ -68,22 +61,9 @@ const ProductListTestPage = ({
   // };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={productListVisible}
-      onRequestClose={closeProductList}
-    >
+    <View style={[styles.overlay, !productListVisible && { display: "none" }]}>
       <View style={styles.container}>
         <View style={styles.infoContainer}>
-          {/* <Text style={styles.title}>N 시리즈</Text>
-          <Text style={styles.mainTitle}>{videoName}</Text>
-          <Text style={styles.description}>
-            {"7화 ・ 2025 드라마 ・ 시리즈"}
-          </Text>
-          <Text style={styles.description}>
-            지금껏 숨겨온 주고받으며 더욱 가까워지는 모습들
-          </Text> */}
           <TouchableOpacity
             style={styles.watchButton}
             onPress={closeProductList}
@@ -114,62 +94,41 @@ const ProductListTestPage = ({
               />
             ))}
           </ScrollView>
-          <ProductModal
-            modalVisible={modalVisible}
-            closeModal={closeModal}
-            selectedProduct={selectedProduct}
-          />
+
+          {/* 상품 상세 모달 */}
+          {modalVisible && (
+            <ProductModal
+              modalVisible={modalVisible}
+              closeModal={closeModal}
+              selectedProduct={selectedProduct}
+            />
+          )}
         </View>
       </View>
-    </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    // backgroundColor: "rgba(0, 0, 0, 0.7)", // 반투명 배경 유지
+    zIndex: 1000,
+    pointerEvents: "box-none",
+  },
   container: {
     flex: 1,
-    paddingTop: "35%",
+    paddingTop: "29%",
     padding: 20,
-  },
-  closeButton: {
-    position: "absolute",
-    bottom: 10,
-    left: 0,
-    zIndex: 10,
-  },
-  closeButtonText: {
-    fontSize: 100,
-    color: "#fff",
+    pointerEvents: "auto",
   },
   infoContainer: {
     left: 50,
   },
-  title: {
-    color: "red",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  mainTitle: {
-    color: "#fff",
-    fontSize: 60,
-    fontWeight: "bold",
-    marginTop: 5,
-  },
-  description: {
-    color: "#ccc",
-    fontSize: 14,
-    marginVertical: 10,
-  },
-  // playPauseButton: {
-  //   position: "absolute",
-  //   top: "-100%",
-  //   left: "30%",
-  //   transform: [{ translateX: -30 }],
-  //   backgroundColor: "rgba(0, 0, 0, 0.5)",
-  //   padding: 15,
-  //   borderRadius: 50,
-  //   alignItems: "center",
-  // },
   watchButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -178,7 +137,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 32,
     alignSelf: "flex-start",
-    // marginBottom: 20,
     marginTop: "8%",
   },
   watchButtonText: {
@@ -192,32 +150,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     paddingLeft: 50,
-  },
-  productCard: {
-    backgroundColor: "#222",
-    padding: 10,
-    borderRadius: 8,
-    width: width * 0.4,
-    marginRight: 10,
-  },
-  productImage: {
-    width: "100%",
-    height: 120,
-    borderRadius: 8,
-  },
-  productName: {
-    color: "#fff",
-    fontSize: 14,
-    marginTop: 5,
-  },
-  productPrice: {
-    color: "#fff",
-    fontSize: 12,
-  },
-  productDiscount: {
-    color: "#FF82A3",
-    fontSize: 12,
-    fontWeight: "bold",
   },
   backIcon: {
     padding: 3,

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  TouchableWithoutFeedback,
 } from "react-native";
 import VideoPlayer from "../molecule/VideoPlayer";
 import ViewShot, { captureRef } from "react-native-view-shot";
@@ -125,6 +126,7 @@ const VideoDetailPage = ({ route }) => {
       setIsPlaying(true);
     }
   };
+
   const sendAudioToServer = async (audioUri) => {
     try {
       const formData = new FormData();
@@ -145,7 +147,7 @@ const VideoDetailPage = ({ route }) => {
 
       // 첫 번째 API 호출 (음성 데이터 전송)
       const searchResponse = await fetch(
-        `${server_url}/api/search_product?user_id=user_0001`,
+        "http://127.0.0.1:8000/api/search_product?user_id=user_0001",
         {
           method: "POST",
           body: formData,
@@ -160,9 +162,24 @@ const VideoDetailPage = ({ route }) => {
       }
 
       const searchData = await searchResponse.json();
+      console.log("searchData", searchData);
 
-      setProductList(searchData.product_list);
+      const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
+
+      // 두 번째 API 호출 (상품 리스트 요청)
+      const productResponse = await fetch(
+        `http://127.0.0.1:8000/api/product_list?user_id=user_0001&product_code=${productId}`
+      );
+
+      if (!productResponse.ok) {
+        throw new Error(`상품 목록 응답 오류: ${productResponse.status}`);
+      }
+
+      const productData = await productResponse.json();
+      console.log("data.product_list", productData.product_list);
+      setProductList(productData.product_list);
       setProductListVisible(true);
+      setIsPlaying(false);
       setIsLoading(false);
     } catch (error) {
       console.error(
@@ -171,6 +188,53 @@ const VideoDetailPage = ({ route }) => {
       );
     }
   };
+
+  // const sendAudioToServer = async (audioUri) => {
+  //   try {
+  //     const formData = new FormData();
+
+  //     // 이미지 파일 추가
+  //     formData.append("image", {
+  //       uri: capturedImage,
+  //       name: "captured_image.png",
+  //       type: "image/png",
+  //     });
+
+  //     const fileType = audioUri.endsWith(".wav") ? "audio/wav" : "audio/m4a"; // iOS의 경우 확장자 확인
+  //     formData.append("audio", {
+  //       uri: audioUri.startsWith("file://") ? audioUri : `file://${audioUri}`,
+  //       name: `recorded_audio.${fileType === "audio/wav" ? "wav" : "m4a"}`, // iOS 확장자 확인
+  //       type: fileType,
+  //     });
+
+  //     // 첫 번째 API 호출 (음성 데이터 전송)
+  //     const searchResponse = await fetch(
+  //       `${server_url}/api/search_product?user_id=user_0001`,
+  //       {
+  //         method: "POST",
+  //         body: formData,
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //         },
+  //       }
+  //     );
+
+  //     if (!searchResponse.ok) {
+  //       throw new Error(`서버 응답 오류: ${searchResponse.status}`);
+  //     }
+
+  //     const searchData = await searchResponse.json();
+
+  //     setProductList(searchData.product_list);
+  //     setProductListVisible(true);
+  //     setIsLoading(false);
+  //   } catch (error) {
+  //     console.error(
+  //       "Error sending audio:",
+  //       error.response?.data || error.message
+  //     );
+  //   }
+  // };
 
   const handleCapture = async () => {
     try {
@@ -192,7 +256,7 @@ const VideoDetailPage = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         activeOpacity={1}
         style={styles.container}
         onPress={handleScreenPress} // 영상 터치 시 버튼 다시 보이기
@@ -216,20 +280,49 @@ const VideoDetailPage = ({ route }) => {
             />
           )}
         </ViewShot>
-
-        {/* Play/Pause 버튼 (showControls 상태에 따라 표시) */}
-        {showControls && (
-          <TouchableOpacity
-            style={[
-              styles.playPauseButton,
-              productListVisible ? styles.smallView : "",
-            ]}
-            onPress={() => setIsPlaying((prev) => !prev)}
+      </TouchableOpacity> */}
+      <TouchableWithoutFeedback
+        onPress={handleScreenPress}
+        accessible={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container} pointerEvents="box-none">
+          <ViewShot
+            ref={viewShotRef}
+            options={{ format: "jpg", quality: 0.9 }}
+            style={styles.videoContainer}
           >
-            <Icon name={isPlaying ? "pause" : "play"} size={30} color="white" />
-          </TouchableOpacity>
-        )}
-      </TouchableOpacity>
+            {videoData && (
+              <VideoPlayer
+                ref={videoRef}
+                productListVisible={productListVisible}
+                setIsPlaying={setIsPlaying}
+                isPlaying={isPlaying}
+                videoUrl={videoData.video_url}
+                videoName={videoData.video_name}
+                setShowSearchButtons={setShowSearchButtons}
+                setShowControls={setShowControls}
+                showControls={showControls}
+              />
+            )}
+          </ViewShot>
+        </View>
+      </TouchableWithoutFeedback>
+      {/* Play/Pause 버튼 (showControls 상태에 따라 표시) */}
+      {showControls && (
+        <TouchableOpacity
+          style={[
+            styles.playPauseButton,
+            productListVisible ? styles.smallView : "",
+          ]}
+          onPress={() => {
+            console.log("click!");
+            setIsPlaying((prev) => !prev);
+          }}
+        >
+          <Icon name={isPlaying ? "pause" : "play"} size={30} color="white" />
+        </TouchableOpacity>
+      )}
       {showSearchButtons && !productListVisible && (
         <View style={{ flexDirection: "row" }}>
           {recording == null ? (
@@ -336,6 +429,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 50,
     alignItems: "center",
+    zIndex: 1100,
   },
   smallView: {
     top: "25%",
