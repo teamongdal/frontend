@@ -31,7 +31,7 @@ const WishlistPage = () => {
     setProductCodeList(cartItems.map((item) => item.product_code));
   }, [cartItems]);
 
-  const rules = [3.1, 2.1, 1, 1.2, 3, 1.4, 2, 1.1, 1.9, 1.6];
+  const rules = [3.1, 3.1, 3, 3.2, 3, 3.4, 3, 3.1, 3.9, 3.6];
 
   const CustomCheckbox = ({ isChecked, onToggle }) => {
     return (
@@ -103,7 +103,7 @@ const WishlistPage = () => {
     }
 
     try {
-      fetch(`${API_URL}/api/cart_unlike?user_id=user_0001`, {
+      fetch(`${server_url}/api/cart_unlike?user_id=user_0001`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -42,7 +42,7 @@ const CartPage = () => {
   }, [selectAll]);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/cart_list?user_id=user_0001`)
+    fetch(`${server_url}/api/cart_list?user_id=user_0001`)
       .then((response) => response.json())
       .then((data) => {
         console.log("API 응답 데이터:", data);
@@ -82,7 +82,7 @@ const CartPage = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/product_unlike`, {
+      const response = await fetch(`${server_url}/api/product_unlike`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

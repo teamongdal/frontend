@@ -135,7 +135,7 @@ const VideoDetailPage = ({ route }) => {
 
       // 첫 번째 API 호출 (음성 데이터 전송)
       const searchResponse = await fetch(
-        "http://127.0.0.1:8000/api/search_product?user_id=user_0001",
+        `${server_url}/api/search_product?user_id=user_0001`,
         {
           method: "POST",
           body: formData,
@@ -150,13 +150,13 @@ const VideoDetailPage = ({ route }) => {
       }
 
       const searchData = await searchResponse.json();
-      console.log("searchData", searchData);
+      // console.log("searchData", searchData);
 
       const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
 
       // 두 번째 API 호출 (상품 리스트 요청)
       const productResponse = await fetch(
-        `http://127.0.0.1:8000/api/product_list?user_id=user_0001&product_code=${productId}`
+        `${server_url}/api/product_list?user_id=user_0001&product_code=${productId}`
       );
 
       if (!productResponse.ok) {
@@ -165,7 +165,9 @@ const VideoDetailPage = ({ route }) => {
 
       const productData = await productResponse.json();
       console.log("data.product_list", productData.product_list);
-      setProductList(productData.product_list);
+      // setProductList(productData.product_list);
+      setProductList(searchData.product_list);
+
       setProductListVisible(true);
       setIsPlaying(false);
     } catch (error) {

@@ -11,9 +11,10 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import ProductCarousel from "../molecule/ProductCarousel";
+import { server_url } from "../../api/function";
 
 const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
-const API_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
+// const API_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
 const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
   const rules = [3.1, 2.1, 1, 1.2, 3, 1.4, 2, 1.1, 1.9, 1.6];
   const [isLike, setIsLike] = useState(null);
@@ -33,7 +34,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
 
       const action = isLike ? "product_unlike" : "product_like";
       const response = await fetch(
-        `${API_URL}/api/${action}?user_id=user_0001&product_code=${selectedProduct.product_code}`,
+        `${server_url}/api/${action}?user_id=user_0001&product_code=${selectedProduct.product_code}`,
         {
           method: "POST",
           headers: {
