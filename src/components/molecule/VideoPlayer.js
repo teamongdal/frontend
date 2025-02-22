@@ -1,18 +1,40 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import Video from "react-native-video";
-import Icon from "react-native-vector-icons/FontAwesome";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const VideoPlayer = forwardRef(
-  ({ videoUrl, setIsPlaying, isPlaying, setShowSearchButtons }, ref) => {
+  (
+    {
+      videoUrl,
+      setIsPlaying,
+      isPlaying,
+      setShowSearchButtons,
+      productListVisible,
+      showControls,
+      setShowControls,
+    },
+    ref
+  ) => {
+    // 0.5초 후에 버튼 숨기기
+    useEffect(() => {
+      if (!isPlaying) {
+        setShowControls(true);
+      } else if (showControls) {
+        const timeout = setTimeout(() => {
+          setShowControls(false);
+        }, 2500);
+        return () => clearTimeout(timeout);
+      }
+    }, [isPlaying, showControls]);
+
     //video_0001 = 스카이캐슬
     const timeline = {
       video_0001: [
         { seconds: 1, frames: 1 },
-        { seconds: 2, frames: 1 },
-        { seconds: 3, frames: 1 },
+        // { seconds: 2, frames: 1 },
+        // { seconds: 3, frames: 1 },
         { seconds: 15, frames: 1 },
         { seconds: 23, frames: 25 },
       ],
@@ -53,25 +75,16 @@ const VideoPlayer = forwardRef(
     };
 
     return (
-      <View style={styles.container}>
-        <Video
-          ref={ref}
-          source={{
-            uri: "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/vod/vod_our_E10_1.mp4",
-          }}
-          style={styles.video}
-          resizeMode="cover"
-          paused={!isPlaying}
-          onProgress={handleProgress}
-        />
-        {/* Play/Pause 버튼 */}
-        {/* <TouchableOpacity
-          style={styles.playPauseButton}
-          onPress={() => setIsPlaying((prev) => !prev)}
-        >
-          <Icon name={isPlaying ? "pause" : "play"} size={30} color="white" />
-        </TouchableOpacity> */}
-      </View>
+      <Video
+        ref={ref}
+        source={{
+          uri: "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/vod/vod_our_E10_1.mp4", //uri: videoUrl,
+        }}
+        style={[styles.video, productListVisible ? styles.small : ""]}
+        resizeMode="contain"
+        paused={!isPlaying}
+        onProgress={handleProgress}
+      />
     );
   }
 );
@@ -81,21 +94,15 @@ export default VideoPlayer;
 const styles = StyleSheet.create({
   container: {
     width: width,
-    height: (width * 9) / 16,
+    height: (width * 9) / 16, // 4:3 비율
   },
   video: {
     position: "absolute",
     width: "100%",
     height: "100%",
   },
-  playPauseButton: {
-    position: "absolute",
-    top: "45%",
-    left: "50%",
-    transform: [{ translateX: -30 }],
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: 15,
-    borderRadius: 50,
-    alignItems: "center",
+  small: {
+    width: (width * 7) / 10,
+    height: ((width * 7) / 10) * (9 / 16), /// 4:3 비율
   },
 });
