@@ -6,22 +6,21 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  Button,
 } from "react-native";
 import VideoPlayer from "../molecule/VideoPlayer";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import { useNavigation } from "@react-navigation/native";
 import { Audio } from "expo-av";
-import axios from "axios";
 import ProductListTestPage from "../page/ProductListTestPage";
 import { server_url } from "../../api/function";
+import LoadingScreen from "../../components/molecule/LoadingBar";
 
 const { width, height } = Dimensions.get("window");
 
 const VideoDetailPage = ({ route }) => {
   const videoId = route?.params?.videoId || null;
   const [videoData, setVideoData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef(null);
@@ -42,11 +41,9 @@ const VideoDetailPage = ({ route }) => {
       .then((response) => response.json())
       .then((data) => {
         setVideoData(data);
-        setLoading(false);
       })
       .catch((error) => {
         console.error("API 요청 실패:", error);
-        setLoading(false);
       });
   }, [videoId]);
 
@@ -108,6 +105,7 @@ const VideoDetailPage = ({ route }) => {
 
     sendAudioToServer(uri);
     setShowSearchButtons(false);
+    setIsLoading(true);
   }
 
   const closeProductList = () => {
@@ -150,26 +148,11 @@ const VideoDetailPage = ({ route }) => {
       }
 
       const searchData = await searchResponse.json();
-      // console.log("searchData", searchData);
 
-      const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
-
-      // 두 번째 API 호출 (상품 리스트 요청)
-      const productResponse = await fetch(
-        `${server_url}/api/product_list?user_id=user_0001&product_code=${productId}`
-      );
-
-      if (!productResponse.ok) {
-        throw new Error(`상품 목록 응답 오류: ${productResponse.status}`);
-      }
-
-      const productData = await productResponse.json();
-      console.log("data.product_list", productData.product_list);
-      // setProductList(productData.product_list);
       setProductList(searchData.product_list);
-
       setProductListVisible(true);
       setIsPlaying(false);
+      setIsLoading(false);
     } catch (error) {
       console.error(
         "Error sending audio:",
@@ -199,7 +182,7 @@ const VideoDetailPage = ({ route }) => {
         options={{ format: "jpg", quality: 0.9 }}
         style={styles.videoContainer}
       >
-        {!loading && videoData && (
+        {videoData && (
           <VideoPlayer
             ref={videoRef}
             setIsPlaying={setIsPlaying}
@@ -239,6 +222,7 @@ const VideoDetailPage = ({ route }) => {
           )}
         </View>
       )}
+      {isLoading && <LoadingScreen capturedImage={capturedImage} />}
       {productListVisible && productList && (
         <ProductListTestPage
           productList={productList}
@@ -304,13 +288,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10,
   },
-  // capturedImage: {
-  //   position: "absolute",
-  //   width: width * 0.5,
-  //   height: width * 0.3,
-  //   marginTop: 10,
-  //   borderRadius: 10,
-  // },
 });
 
 export default VideoDetailPage;
