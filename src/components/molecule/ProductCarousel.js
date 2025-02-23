@@ -76,8 +76,9 @@ const styles = StyleSheet.create({
     left: "23%",
   },
   productImage: {
-    width: width * 0.3,
+    width: width * 0.25,
     height: "100%",
+    left: 20,
   },
   arrowLeft: {
     position: "absolute",
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
   },
   arrowRight: {
     position: "absolute",
-    right: 180,
+    right: -370,
     zIndex: 10,
     top: "45%",
     padding: 10,
