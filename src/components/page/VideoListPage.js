@@ -11,7 +11,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { server_url } from "../../api/function";
-const { width } = Dimensions.get("window"); // 화면 크기 가져오기
+const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
 
 const sideIcons = ["star", "film", "gift", "gamepad", , "home", "smile-o"];
 
@@ -46,20 +46,13 @@ const VideoListPage = () => {
       navigation.navigate("WishlistPage", { user_id: "user_0001" });
     }
   };
-
   return (
     <View style={styles.container}>
       {/* 사이드바 아이콘 */}
       <View style={styles.sidebar}>
         {sideIcons.map((icon, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => {
-              handleClickIcon(index);
-            }}
-          >
+          <TouchableOpacity key={index} onPress={() => handleClickIcon(index)}>
             <Icon
-              key={index}
               name={icon}
               size={width * 0.025}
               color="gray"
@@ -71,11 +64,20 @@ const VideoListPage = () => {
 
       {/* 메인 컨텐츠 */}
       <View style={styles.mainContent}>
-        <Text style={styles.headerTitle}>Google Play 무비</Text>
-        <Text style={styles.headerSubtitle}>TV에서 보면 더 커지는 즐거움!</Text>
-        <Text style={styles.headerSubtitle}>
-          Google이 제공하는 다양한 게임과 앱을 지금 만나보세요
-        </Text>
+        {/* 배너 이미지 추가 */}
+        <Image
+          source={require("../../assets/banner.png")}
+          style={styles.bannerImage}
+        />
+        <View style={styles.textWrap}>
+          <Text style={styles.headerTitle}>Google Play 무비</Text>
+          <Text style={styles.headerSubtitle}>
+            TV에서 보면 더 커지는 즐거움!
+          </Text>
+          <Text style={styles.headerSubtitle}>
+            Google이 제공하는 다양한 게임과 앱을 지금 만나보세요
+          </Text>
+        </View>
         <Text style={styles.title}>컨텐츠</Text>
 
         {/* 컨텐츠 리스트 */}
@@ -126,15 +128,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 20,
   },
+  textWrap: {
+    position: "absolute",
+    top: "15%",
+    left: "5%",
+  },
+  bannerImage: {
+    width: "100%",
+    height: height * 0.4, // 화면 높이에 맞춘 배너 크기
+    resizeMode: "cover",
+    marginBottom: 20,
+    borderRadius: 10,
+  },
   headerTitle: {
     color: "white",
-    fontSize: width * 0.04, // 반응형 폰트 크기
+    fontSize: width * 0.04,
     fontWeight: "bold",
     marginBottom: 8,
   },
   headerSubtitle: {
     color: "gray",
-    fontSize: width * 0.018, // 반응형 폰트 크기
+    fontSize: width * 0.018,
     marginBottom: 4,
   },
   title: {
@@ -147,8 +161,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   card: {
-    width: width * 0.22, // 반응형 크기
-    height: width * 0.38, // 비율 조정
+    width: width * 0.21,
+    height: width * 0.35,
     marginRight: width * 0.03,
     borderRadius: 12,
     overflow: "hidden",
@@ -156,19 +170,19 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: "85%", // 이미지 비율 맞추기
+    height: "85%",
     resizeMode: "cover",
   },
   textContainer: {
-    padding: 8,
+    paddingHorizontal: 8,
     alignItems: "center",
+    paddingTop: "20",
   },
   text: {
     color: "white",
-    fontSize: width * 0.018, // 가변적인 폰트 크기
+    fontSize: width * 0.018,
     fontWeight: "600",
     textAlign: "center",
   },
 });
-
 export default VideoListPage;
