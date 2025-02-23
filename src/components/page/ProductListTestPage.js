@@ -23,7 +23,7 @@ const ProductListTestPage = ({
 }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeIdx, setActiveIdx] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(true);
 
   useEffect(() => {
     setSelectedProduct(productList[0]);
@@ -32,7 +32,6 @@ const ProductListTestPage = ({
   const closeModal = () => {
     setModalVisible(false);
     setActiveIdx(null);
-    setIsPlaying(true);
   };
 
   // const toggleFilter = async () => {

@@ -16,7 +16,7 @@ import { server_url } from "../../api/function";
 const { width, height } = Dimensions.get("window"); // 화면 크기 가져오기
 // const API_URL = "http://127.0.0.1:8000"; // 백엔드 서버 주소
 const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
-  const rules = [3.1, 2.1, 1, 1.2, 3, 1.4, 2, 1.1, 1.9, 1.6];
+  const rules = [3.1, 3.1, 3, 3.2, 3, 3.4, 3, 3.1, 3.9, 3.6];
   const [isLike, setIsLike] = useState(null);
 
   useEffect(() => {
