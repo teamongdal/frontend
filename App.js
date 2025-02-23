@@ -11,28 +11,45 @@ import VideoListPage from "./src/components/page/VideoListPage";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = () => {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="VideoList" component={VideoListPage} />
-      <Tab.Screen name="WishlistPage" component={WishlistPage} />
-      <Tab.Screen name="HighLightPage" component={HighLightPage} />
-    </Tab.Navigator>
-  );
-};
+// const TabNavigator = () => {
+//   return (
+//     <Tab.Navigator>
+//       <Tab.Screen name="VideoList" component={VideoListPage} />
+//       <Tab.Screen name="WishlistPage" component={WishlistPage} />
+//       <Tab.Screen name="HighLightPage" component={HighLightPage} />
+//     </Tab.Navigator>
+//   );
+// };
 
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
+        {/* <Stack.Screen
           name="HomeTabs"
           component={TabNavigator}
           options={{ headerShown: false }}
+        /> */}
+        <Stack.Screen
+          name="VideoList"
+          component={VideoListPage}
+          options={{ headerShown: false }}
         />
-        <Stack.Screen name="VideoDetail" component={VideoDetailPage} />
-        <Stack.Screen name="HighLightPage" component={HighLightPage} />
-        <Stack.Screen name="WishlistPage" component={WishlistPage} />
+        <Stack.Screen
+          name="VideoDetail"
+          component={VideoDetailPage}
+          // options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="HighLightPage"
+          component={HighLightPage}
+          // options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="WishlistPage"
+          component={WishlistPage}
+          // options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

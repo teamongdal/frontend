@@ -13,7 +13,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { server_url } from "../../api/function";
 const { width } = Dimensions.get("window"); // 화면 크기 가져오기
 
-const sideIcons = ["gift", "gamepad", "star", "home", "film", "smile-o"];
+const sideIcons = ["star", "film", "gift", "gamepad", , "home", "smile-o"];
 
 const VideoListPage = () => {
   const navigation = useNavigation();
@@ -39,18 +39,33 @@ const VideoListPage = () => {
     navigation.navigate("VideoDetail", { videoId });
   };
 
+  const handleClickIcon = (index) => {
+    if (index === 1) {
+      navigation.navigate("HighLightPage", { user_id: "user_0001" });
+    } else if (index === 0) {
+      navigation.navigate("WishlistPage", { user_id: "user_0001" });
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* 사이드바 아이콘 */}
       <View style={styles.sidebar}>
         {sideIcons.map((icon, index) => (
-          <Icon
+          <TouchableOpacity
             key={index}
-            name={icon}
-            size={width * 0.025}
-            color="gray"
-            style={styles.icon}
-          />
+            onPress={() => {
+              handleClickIcon(index);
+            }}
+          >
+            <Icon
+              key={index}
+              name={icon}
+              size={width * 0.025}
+              color="gray"
+              style={styles.icon}
+            />
+          </TouchableOpacity>
         ))}
       </View>
 
