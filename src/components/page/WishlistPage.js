@@ -59,6 +59,7 @@ const WishlistPage = () => {
       .then((data) => {
         setCartItems(data.cart_list || []);
         setIsLoading(false);
+        console.log("data.cart_list: ", data.cart_list);
       })
       .catch((error) => {
         console.error("API 요청 실패:", error);
@@ -149,7 +150,10 @@ const WishlistPage = () => {
             value={isFilterEnabled}
             onValueChange={toggleFilter}
             trackColor={{ false: "#ccc", true: "#830023" }}
+            thumbColor={isFilterEnabled ? "#fff" : "#f4f3f4"}
+            style={styles.smallSwitch} // 추가된 스타일
           />
+
           <View
             style={{
               borderWidth: 1,
@@ -213,14 +217,14 @@ const WishlistPage = () => {
                   style={styles.icon}
                 />
                 <Text style={styles.rating}>
-                  {item.review_rating ?? item.review_rating == "없음"
+                  {item.review_rating && item.review_rating == "없음"
                     ? Math.floor(
                         rules[item.product_code[item.product_code.length - 1]] +
                           1
                       ) + 0.5
                     : item.review_rating}
                   (
-                  {item.review_cnt ??
+                  {item.review_cnt &&
                     (item.review_cnt == "없음" ? 1 : item.review_cnt)}
                   ) <Text style={{ gap: 4 }}>{" ・ "}</Text>
                 </Text>
@@ -233,7 +237,7 @@ const WishlistPage = () => {
                   <Text style={styles.heart}>
                     {item.heart_cnt ??
                       rules[item.product_code[item.product_code.length - 1]] +
-                        "k"}
+                        "K"}
                   </Text>
                 </View>
               </View>
@@ -242,7 +246,7 @@ const WishlistPage = () => {
         )}
         onScroll={(event) => {
           const offsetY = event.nativeEvent.contentOffset.y;
-          setShowScrollTop(offsetY > height * 0.3); // 일정 높이 이상 내려가면 버튼 표시
+          setShowScrollTop(offsetY > height * 0.3);
         }}
       />
       {showScrollTop && (
@@ -286,6 +290,9 @@ const styles = StyleSheet.create({
   },
   toggleContainer: { flexDirection: "row", alignItems: "center", gap: 4 },
   grayText: { color: "#898D99", fontSize: 13 },
+  smallSwitch: {
+    transform: [{ scaleX: 0.6 }, { scaleY: 0.6 }],
+  },
   listContainer: { paddingHorizontal: 12, paddingBottom: 20 },
   itemContainer: {
     width: ITEM_WIDTH,
@@ -314,7 +321,6 @@ const styles = StyleSheet.create({
     height: 20,
     top: 0,
     left: 0,
-    // transform: [{ scale: 0.9 }], // 체크박스 크기 조절
   },
   image: { width: "100%", height: 209, borderRadius: 8 },
   brand: { fontSize: 12, color: "#898D99", marginTop: 12 },
@@ -337,9 +343,9 @@ const styles = StyleSheet.create({
   },
   price: { fontWeight: "bold", fontSize: 16 },
   ratingContainer: {
-    flexDirection: "row", // 가로 정렬
-    justifyContent: "space-between", // 좌우 배치
-    alignItems: "center", // 수직 정렬
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 4,
     marginBottom: 16,
   },
@@ -357,7 +363,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 12,
     height: 12,
-    marginRight: 4, // 아이콘과 텍스트 사이 간격 추가
+    marginRight: 4,
   },
 
   rating: {
