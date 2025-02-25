@@ -53,7 +53,7 @@ const LoadingBar = ({ capturedImage }) => {
               cx="70"
               cy="70"
               r="50"
-              stroke="#E6FF4E"
+              stroke="#830023"
               strokeWidth="10"
               fill="none"
               strokeDasharray={Math.PI * 2 * 50}
