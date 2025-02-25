@@ -16,6 +16,7 @@ import ProductListTestPage from "../page/ProductListTestPage";
 import { server_url } from "../../api/function";
 import LoadingScreen from "../../components/molecule/LoadingBar";
 import Icon from "react-native-vector-icons/FontAwesome";
+import RetryAlertPage from "../molecule/RetryAlertPage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,11 +35,18 @@ const VideoDetailPage = ({ route }) => {
   const [productList, setProductList] = useState([]);
   const [showSearchButtons, setShowSearchButtons] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [isRetry, setIsReTry] = useState(false);
+  const [isRetry, setIsRetry] = useState(false);
+  const [retryText, setRetryText] = useState("");
 
   const textList = ["가운데 옷 정보 알려줘", "왼쪽 옷 정보 알려줘"];
 
   const [curTextIdx, setCurTextIdx] = useState(0);
+
+  useEffect(() => {
+    if (!!videoData) {
+      setShowSearchButtons(true);
+    }
+  }, [videoData]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,16 +57,15 @@ const VideoDetailPage = ({ route }) => {
   }, []);
 
   useEffect(() => {
+    console.log("isRetry", isRetry);
     if (isRetry) {
+      // 상태 초기화
       if (isPlaying) {
         setIsPlaying(false);
       }
-
       setIsLoading(false);
       setProductListVisible(false);
-      setIsPlaying(false);
-      setShowSearchButtons(true);
-      setIsReTry(false);
+      // setShowSearchButtons(true);
     }
   }, [isRetry]);
 
@@ -142,7 +149,7 @@ const VideoDetailPage = ({ route }) => {
     const uri = recording.getURI();
 
     sendAudioToServer(uri);
-    setShowSearchButtons(false);
+    // setShowSearchButtons(false);
     setIsLoading(true);
   }
 
@@ -196,7 +203,12 @@ const VideoDetailPage = ({ route }) => {
         setIsPlaying(false);
         setIsLoading(false);
       } else {
-        setIsReTry(true);
+        setRetryText(
+          searchData?.user_prompt_original == "No speech detected."
+            ? "인식된 문장이 없습니다."
+            : searchData?.user_prompt_original
+        );
+        setIsRetry(true);
       }
 
       // const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
@@ -267,7 +279,7 @@ const VideoDetailPage = ({ route }) => {
   //       setIsPlaying(false);
   //       setIsLoading(false);
   //     } else {
-  //       setIsReTry(true);
+  //       setIsRetry(true);
   //     }
   //   } catch (error) {
   //     console.error(
@@ -419,6 +431,9 @@ const VideoDetailPage = ({ route }) => {
         </View>
       )} */}
       {isLoading && <LoadingScreen capturedImage={capturedImage} />}
+      {isRetry && (
+        <RetryAlertPage setIsRetry={setIsRetry} retryText={retryText} />
+      )}
       {productListVisible && productList && (
         <ProductListTestPage
           productList={productList}
@@ -475,11 +490,11 @@ const styles = StyleSheet.create({
     left: 0,
     marginTop: 10,
     backgroundColor: "rgba(255, 255, 255, 0.9)",
-    padding: 20,
+    padding: 5,
     paddingHorizontal: 50,
     width: 370,
     borderRadius: 100,
-    borderWidth: 4,
+    borderWidth: 2,
     borderColor: "#a11a32",
     display: "flex", // Flex 적용
     marginBottom: 50,

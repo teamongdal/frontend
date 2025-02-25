@@ -140,7 +140,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                 <View style={styles.priceContainer}>
                   {selectedProduct?.discount_rate !== "0" && (
                     <Text style={styles.discount}>
-                      {selectedProduct.discount_rate + "%"}
+                      {selectedProduct.discount_rate}
                     </Text>
                   )}
                   <Text style={styles.price}>
