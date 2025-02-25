@@ -34,6 +34,33 @@ const VideoDetailPage = ({ route }) => {
   const [productList, setProductList] = useState([]);
   const [showSearchButtons, setShowSearchButtons] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [isRetry, setIsReTry] = useState(false);
+
+  const textList = ["가운데 옷 정보 알려줘", "왼쪽 옷 정보 알려줘"];
+
+  const [curTextIdx, setCurTextIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurTextIdx((prevIndex) => (prevIndex + 1) % textList.length);
+    }, 2000);
+
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 정리
+  }, []);
+
+  useEffect(() => {
+    if (isRetry) {
+      if (isPlaying) {
+        setIsPlaying(false);
+      }
+
+      setIsLoading(false);
+      setProductListVisible(false);
+      setIsPlaying(false);
+      setShowSearchButtons(true);
+      setIsReTry(false);
+    }
+  }, [isRetry]);
 
   useEffect(() => {
     console.log("videoData", videoData);
@@ -41,7 +68,7 @@ const VideoDetailPage = ({ route }) => {
 
   useEffect(() => {
     if (productListVisible) {
-      setIsPlaying(productListVisible);
+      setIsPlaying(true);
     }
   }, [productListVisible]);
 
@@ -147,7 +174,7 @@ const VideoDetailPage = ({ route }) => {
 
       // 첫 번째 API 호출 (음성 데이터 전송)
       const searchResponse = await fetch(
-        "http://127.0.0.1:8000/api/search_product?user_id=user_0001",
+        `${server_url}/api/search_product?user_id=user_0001`,
         {
           method: "POST",
           body: formData,
@@ -163,24 +190,32 @@ const VideoDetailPage = ({ route }) => {
 
       const searchData = await searchResponse.json();
       console.log("searchData", searchData);
-
-      const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
-
-      // 두 번째 API 호출 (상품 리스트 요청)
-      const productResponse = await fetch(
-        `http://127.0.0.1:8000/api/product_list?user_id=user_0001&product_code=${productId}`
-      );
-
-      if (!productResponse.ok) {
-        throw new Error(`상품 목록 응답 오류: ${productResponse.status}`);
+      if (searchData?.success) {
+        setProductList(searchData?.product_list);
+        setProductListVisible(true);
+        setIsPlaying(false);
+        setIsLoading(false);
+      } else {
+        setIsReTry(true);
       }
 
-      const productData = await productResponse.json();
-      console.log("data.product_list", productData.product_list);
-      setProductList(productData.product_list);
-      setProductListVisible(true);
-      setIsPlaying(false);
-      setIsLoading(false);
+      // const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
+
+      // // 두 번째 API 호출 (상품 리스트 요청)
+      // const productResponse = await fetch(
+      //   `${server_url}/api/product_list?user_id=user_0001&product_code=${productId}`
+      // );
+
+      // if (!productResponse.ok) {
+      //   throw new Error(`상품 목록 응답 오류: ${productResponse.status}`);
+      // }
+
+      // const productData = await productResponse.json();
+      // console.log("data.product_list", productData.product_list);
+      // setProductList(productData.product_list);
+      // setProductListVisible(true);
+      // setIsPlaying(false);
+      // setIsLoading(false);
     } catch (error) {
       console.error(
         "Error sending audio:",
@@ -189,6 +224,7 @@ const VideoDetailPage = ({ route }) => {
     }
   };
 
+  //실전 테스트
   // const sendAudioToServer = async (audioUri) => {
   //   try {
   //     const formData = new FormData();
@@ -224,10 +260,15 @@ const VideoDetailPage = ({ route }) => {
   //     }
 
   //     const searchData = await searchResponse.json();
-
-  //     setProductList(searchData.product_list);
-  //     setProductListVisible(true);
-  //     setIsLoading(false);
+  //     console.log("searchData", searchData);
+  //     if (searchData?.success) {
+  //       setProductList(searchData?.product_list);
+  //       setProductListVisible(true);
+  //       setIsPlaying(false);
+  //       setIsLoading(false);
+  //     } else {
+  //       setIsReTry(true);
+  //     }
   //   } catch (error) {
   //     console.error(
   //       "Error sending audio:",
@@ -235,7 +276,6 @@ const VideoDetailPage = ({ route }) => {
   //     );
   //   }
   // };
-
   const handleCapture = async () => {
     try {
       const uri = await captureRef(viewShotRef, {
@@ -324,6 +364,32 @@ const VideoDetailPage = ({ route }) => {
         </TouchableOpacity>
       )}
       {showSearchButtons && !productListVisible && (
+        <View>
+          <Text style={styles.examTextWrap}>{textList[curTextIdx]}</Text>
+          {recording == null ? (
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={handleClickSearch}
+            >
+              <Image
+                source={require("../../assets/voice.png")}
+                style={styles.micButton}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={stopRecording}
+            >
+              <Image
+                source={require("../../assets/unvoice.png")}
+                style={styles.micButton}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+      {/* {showSearchButtons && !productListVisible && (
         <View style={{ flexDirection: "row" }}>
           {recording == null ? (
             <TouchableOpacity
@@ -351,7 +417,7 @@ const VideoDetailPage = ({ route }) => {
             </TouchableOpacity>
           )}
         </View>
-      )}
+      )} */}
       {isLoading && <LoadingScreen capturedImage={capturedImage} />}
       {productListVisible && productList && (
         <ProductListTestPage
@@ -389,21 +455,34 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
   },
+
   micButton: {
-    padding: 10,
-    width: 200,
-    height: 200,
+    padding: 5,
+    width: 100,
+    height: 100,
     backgroundColor: "white",
     borderRadius: 100,
+    right: -700,
   },
-  buttonText: {
-    color: "white",
+  examTextWrap: {
+    flexDirection: "row",
+    justifyContent: "center", // 가로 정렬
+    alignItems: "center", // 세로 정렬
+    textAlign: "center", // 텍스트 정렬
+    color: "#a11a32",
     fontSize: 30,
     fontWeight: "bold",
-    left: -130,
+    left: 0,
     marginTop: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    padding: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    padding: 20,
+    paddingHorizontal: 50,
+    width: 370,
+    borderRadius: 100,
+    borderWidth: 4,
+    borderColor: "#a11a32",
+    display: "flex", // Flex 적용
+    marginBottom: 50,
   },
   buttonStopText: {
     color: "white",
