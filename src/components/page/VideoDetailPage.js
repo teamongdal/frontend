@@ -8,7 +8,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
-import VideoPlayer from "../molecule/VideoPlayer";
+import VideoPlayer from "../molecule/VideoPlayer"; // 수정된 VideoPlayer.js를 사용
 import ViewShot, { captureRef } from "react-native-view-shot";
 import { useNavigation } from "@react-navigation/native";
 import { Audio } from "expo-av";
@@ -39,11 +39,10 @@ const VideoDetailPage = ({ route }) => {
   const [retryText, setRetryText] = useState("");
 
   const textList = ["가운데 옷 정보 알려줘", "왼쪽 옷 정보 알려줘"];
-
   const [curTextIdx, setCurTextIdx] = useState(0);
 
   useEffect(() => {
-    if (!!videoData) {
+    if (videoData) {
       setShowSearchButtons(true);
     }
   }, [videoData]);
@@ -52,20 +51,17 @@ const VideoDetailPage = ({ route }) => {
     const interval = setInterval(() => {
       setCurTextIdx((prevIndex) => (prevIndex + 1) % textList.length);
     }, 2000);
-
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 정리
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     console.log("isRetry", isRetry);
     if (isRetry) {
-      // 상태 초기화
       if (isPlaying) {
         setIsPlaying(false);
       }
       setIsLoading(false);
       setProductListVisible(false);
-      // setShowSearchButtons(true);
     }
   }, [isRetry]);
 
@@ -81,7 +77,6 @@ const VideoDetailPage = ({ route }) => {
 
   useEffect(() => {
     if (!videoId) return;
-
     fetch(`${server_url}/api/video_play?video_id=${videoId}`)
       .then((response) => response.json())
       .then((data) => {
@@ -110,16 +105,15 @@ const VideoDetailPage = ({ route }) => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync({
+      const recordingInstance = new Audio.Recording();
+      await recordingInstance.prepareToRecordAsync({
         isMeteringEnabled: false,
         android: {
           extension: ".wav",
           outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT,
           audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AMR_NB,
           sampleRate: 44100,
-          numberOfChannels: 1, // 모노 설정
+          numberOfChannels: 1,
           bitRate: 128000,
         },
         ios: {
@@ -127,13 +121,12 @@ const VideoDetailPage = ({ route }) => {
           outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
           audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
           sampleRate: 44100,
-          numberOfChannels: 1, // 모노 설정
+          numberOfChannels: 1,
           bitRate: 128000,
         },
       });
-
-      await recording.startAsync();
-      setRecording(recording);
+      await recordingInstance.startAsync();
+      setRecording(recordingInstance);
       handleCapture();
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -143,13 +136,9 @@ const VideoDetailPage = ({ route }) => {
   async function stopRecording() {
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-    });
+    await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
     const uri = recording.getURI();
-
     sendAudioToServer(uri);
-    // setShowSearchButtons(false);
     setIsLoading(true);
   }
 
@@ -164,30 +153,24 @@ const VideoDetailPage = ({ route }) => {
   const sendAudioToServer = async (audioUri) => {
     try {
       const formData = new FormData();
-
-      // 이미지 파일 추가
       formData.append("image", {
         uri: capturedImage,
         name: "captured_image.png",
         type: "image/png",
       });
-
-      const fileType = audioUri.endsWith(".wav") ? "audio/wav" : "audio/m4a"; // iOS의 경우 확장자 확인
+      const fileType = audioUri.endsWith(".wav") ? "audio/wav" : "audio/m4a";
       formData.append("audio", {
         uri: audioUri.startsWith("file://") ? audioUri : `file://${audioUri}`,
-        name: `recorded_audio.${fileType === "audio/wav" ? "wav" : "m4a"}`, // iOS 확장자 확인
+        name: `recorded_audio.${fileType === "audio/wav" ? "wav" : "m4a"}`,
         type: fileType,
       });
 
-      // 첫 번째 API 호출 (음성 데이터 전송)
       const searchResponse = await fetch(
         `${server_url}/api/search_product?user_id=user_0001`,
         {
           method: "POST",
           body: formData,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
@@ -204,104 +187,30 @@ const VideoDetailPage = ({ route }) => {
         setIsLoading(false);
       } else {
         setRetryText(
-          searchData?.user_prompt_original == "No speech detected."
+          searchData?.user_prompt_original === "No speech detected."
             ? "인식된 문장이 없습니다."
             : searchData?.user_prompt_original
         );
         setIsRetry(true);
       }
-
-      // const productId = "musinsa_cardigan_0002"; //route?.params?.videoId || null;
-
-      // // 두 번째 API 호출 (상품 리스트 요청)
-      // const productResponse = await fetch(
-      //   `${server_url}/api/product_list?user_id=user_0001&product_code=${productId}`
-      // );
-
-      // if (!productResponse.ok) {
-      //   throw new Error(`상품 목록 응답 오류: ${productResponse.status}`);
-      // }
-
-      // const productData = await productResponse.json();
-      // console.log("data.product_list", productData.product_list);
-      // setProductList(productData.product_list);
-      // setProductListVisible(true);
-      // setIsPlaying(false);
-      // setIsLoading(false);
     } catch (error) {
-      console.error(
-        "Error sending audio:",
-        error.response?.data || error.message
-      );
+      console.error("Error sending audio:", error.response?.data || error.message);
     }
   };
 
-  //실전 테스트
-  // const sendAudioToServer = async (audioUri) => {
-  //   try {
-  //     const formData = new FormData();
-
-  //     // 이미지 파일 추가
-  //     formData.append("image", {
-  //       uri: capturedImage,
-  //       name: "captured_image.png",
-  //       type: "image/png",
-  //     });
-
-  //     const fileType = audioUri.endsWith(".wav") ? "audio/wav" : "audio/m4a"; // iOS의 경우 확장자 확인
-  //     formData.append("audio", {
-  //       uri: audioUri.startsWith("file://") ? audioUri : `file://${audioUri}`,
-  //       name: `recorded_audio.${fileType === "audio/wav" ? "wav" : "m4a"}`, // iOS 확장자 확인
-  //       type: fileType,
-  //     });
-
-  //     // 첫 번째 API 호출 (음성 데이터 전송)
-  //     const searchResponse = await fetch(
-  //       `${server_url}/api/search_product?user_id=user_0001`,
-  //       {
-  //         method: "POST",
-  //         body: formData,
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //         },
-  //       }
-  //     );
-
-  //     if (!searchResponse.ok) {
-  //       throw new Error(`서버 응답 오류: ${searchResponse.status}`);
-  //     }
-
-  //     const searchData = await searchResponse.json();
-  //     console.log("searchData", searchData);
-  //     if (searchData?.success) {
-  //       setProductList(searchData?.product_list);
-  //       setProductListVisible(true);
-  //       setIsPlaying(false);
-  //       setIsLoading(false);
-  //     } else {
-  //       setIsRetry(true);
-  //     }
-  //   } catch (error) {
-  //     console.error(
-  //       "Error sending audio:",
-  //       error.response?.data || error.message
-  //     );
-  //   }
-  // };
   const handleCapture = async () => {
     try {
       const uri = await captureRef(viewShotRef, {
-        format: "png",
-        quality: 0.8,
+        format: "jpg",
+        quality: 0.9,
       });
-
       setCapturedImage(uri);
       console.log("캡처 성공:", uri);
     } catch (error) {
       console.error("캡처 실패:", error);
     }
   };
-  // 화면 터치 시 버튼 보이게 하기
+
   const handleScreenPress = () => {
     setShowControls(true);
   };
@@ -312,33 +221,8 @@ const VideoDetailPage = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      {/* <TouchableOpacity
-        activeOpacity={1}
-        style={styles.container}
-        onPress={handleScreenPress} // 영상 터치 시 버튼 다시 보이기
-      >
-        <ViewShot
-          ref={viewShotRef}
-          options={{ format: "jpg", quality: 0.9 }}
-          style={styles.videoContainer}
-        >
-          {videoData && (
-            <VideoPlayer
-              ref={videoRef}
-              productListVisible={productListVisible}
-              setIsPlaying={setIsPlaying}
-              isPlaying={isPlaying}
-              videoUrl={videoData.video_url}
-              videoName={videoData.video_name}
-              setShowSearchButtons={setShowSearchButtons}
-              setShowControls={setShowControls}
-              showControls={showControls}
-            />
-          )}
-        </ViewShot>
-      </TouchableOpacity> */}
       <TouchableWithoutFeedback
-        onPress={()=>{handleScreenPress()}}
+        onPress={handleScreenPress}
         accessible={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -348,7 +232,7 @@ const VideoDetailPage = ({ route }) => {
             options={{ format: "jpg", quality: 0.9 }}
             style={styles.videoContainer}
           >
-            {videoData && (
+            {videoData && videoData.video_url ? (
               <VideoPlayer
                 ref={videoRef}
                 productListVisible={productListVisible}
@@ -360,17 +244,17 @@ const VideoDetailPage = ({ route }) => {
                 setShowControls={setShowControls}
                 showControls={showControls}
               />
+            ) : (
+              <View style={[styles.videoContainer, { justifyContent: "center", alignItems: "center" }]}>
+                <Text style={{ color: "white" }}>재생할 비디오 데이터가 없습니다.</Text>
+              </View>
             )}
           </ViewShot>
         </View>
       </TouchableWithoutFeedback>
-      {/* Play/Pause 버튼 (showControls 상태에 따라 표시) */}
       {showControls && (
         <TouchableOpacity
-          style={[
-            styles.playPauseButton,
-            productListVisible ? styles.smallView : "",
-          ]}
+          style={[styles.playPauseButton, productListVisible ? styles.smallView : null]}
           onPress={() => {
             console.log("click!");
             setIsPlaying((prev) => !prev);
@@ -381,37 +265,22 @@ const VideoDetailPage = ({ route }) => {
       )}
       {showSearchButtons && !productListVisible && (
         <View>
-          <TouchableOpacity
-            style={styles.captureButton}
-            onPress={()=>{handleGoHighlight()}}
-          >
+          <TouchableOpacity style={styles.captureButton} onPress={handleGoHighlight}>
             <Image
               source={require("../../assets/icon-highlight.png")}
               style={styles.hightLightButton}
             />
-            {/* <Icon
-              name="angle-up"
-              size={24}
-              color="#fff"
-              style={{ left: 10, top: 4 }}
-            /> */}
           </TouchableOpacity>
           <Text style={styles.examTextWrap}>{textList[curTextIdx]}</Text>
           {recording == null ? (
-            <TouchableOpacity
-              style={styles.captureButton}
-              onPress={()=>{handleClickSearch()}}
-            >
+            <TouchableOpacity style={styles.captureButton} onPress={handleClickSearch}>
               <Image
                 source={require("../../assets/voice.png")}
                 style={styles.micButton}
               />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              style={styles.captureButton}
-              onPress={()=>{stopRecording()}}
-            >
+            <TouchableOpacity style={styles.captureButton} onPress={stopRecording}>
               <Image
                 source={require("../../assets/unvoice.png")}
                 style={styles.micButton}
@@ -420,35 +289,6 @@ const VideoDetailPage = ({ route }) => {
           )}
         </View>
       )}
-      {/* {showSearchButtons && !productListVisible && (
-        <View style={{ flexDirection: "row" }}>
-          {recording == null ? (
-            <TouchableOpacity
-              style={styles.captureButton}
-              onPress={handleClickSearch}
-            >
-              <Image
-                source={require("../../assets/voice.png")}
-                style={styles.micButton}
-              />
-              <Text style={styles.buttonText}>
-                클릭 후 찾고 싶은 옷 정보를 알려주세요
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.captureButton}
-              onPress={stopRecording}
-            >
-              <Image
-                source={require("../../assets/unvoice.png")}
-                style={styles.micButton}
-              />
-              <Text style={styles.buttonStopText}>녹음을 종료합니다.</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )} */}
       {isLoading && <LoadingScreen capturedImage={capturedImage} />}
       {isRetry && (
         <RetryAlertPage setIsRetry={setIsRetry} retryText={retryText} />
@@ -462,7 +302,7 @@ const VideoDetailPage = ({ route }) => {
           videoName={videoData?.video_name}
           setIsPlaying={setIsPlaying}
           isPlaying={isPlaying}
-        ></ProductListTestPage>
+        />
       )}
     </View>
   );
@@ -507,9 +347,9 @@ const styles = StyleSheet.create({
   },
   examTextWrap: {
     flexDirection: "row",
-    justifyContent: "center", // 가로 정렬
-    alignItems: "center", // 세로 정렬
-    textAlign: "center", // 텍스트 정렬
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
     color: "#a11a32",
     fontSize: 30,
     fontWeight: "bold",
@@ -522,23 +362,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderWidth: 2,
     borderColor: "#a11a32",
-    display: "flex", // Flex 적용
+    display: "flex",
     marginBottom: 50,
-  },
-  buttonStopText: {
-    color: "white",
-    fontSize: 30,
-    fontWeight: "bold",
-    left: -30,
-    marginTop: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    padding: 10,
-  },
-  capturedImage: {
-    width: 200,
-    height: 120,
-    marginTop: 20,
-    borderRadius: 10,
   },
   playPauseButton: {
     position: "absolute",

@@ -1,6 +1,6 @@
 import React, { forwardRef, useState, useEffect } from "react";
-import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
-import Video from "react-native-video";
+import { StyleSheet, Dimensions } from "react-native";
+import { Video } from "expo-av";
 
 const { width, height } = Dimensions.get("window");
 
@@ -17,7 +17,7 @@ const VideoPlayer = forwardRef(
     },
     ref
   ) => {
-    // 0.5초 후에 버튼 숨기기
+    // 재생 중일 때 2.5초 후에 컨트롤 버튼 숨기기
     useEffect(() => {
       if (!isPlaying) {
         setShowControls(true);
@@ -29,12 +29,10 @@ const VideoPlayer = forwardRef(
       }
     }, [isPlaying, showControls]);
 
-    //video_0001 = 스카이캐슬
+    // 타임라인 데이터 (예시)
     const timeline = {
       video_0001: [
         { seconds: 1, frames: 1 },
-        // { seconds: 2, frames: 1 },
-        // { seconds: 3, frames: 1 },
         { seconds: 15, frames: 1 },
         { seconds: 23, frames: 25 },
       ],
@@ -46,13 +44,12 @@ const VideoPlayer = forwardRef(
       ],
     };
 
-    // 초 + 프레임을 초 단위로 변환 (30fps 기준)
+    // (30fps 기준) 초 + 프레임을 초 단위로 변환
     const convertToSeconds = (seconds, frames) => {
       return seconds + frames / 30;
     };
 
     const videoKey = "video_0001";
-
     const stopTimes = videoKey
       ? timeline[videoKey].map(({ seconds, frames }) =>
           convertToSeconds(seconds, frames)
@@ -60,13 +57,13 @@ const VideoPlayer = forwardRef(
       : [];
 
     const [curIdx, setCurIdx] = useState(0);
-    // 현재 영상 시간 감지하여 특정 타임라인에 도달하면 멈춤
-    const handleProgress = ({ currentTime }) => {
-      const currentFrame = Math.round(currentTime * 24);
 
+    // expo-av Video는 onPlaybackStatusUpdate를 사용합니다.
+    const handlePlaybackStatusUpdate = (status) => {
+      if (!status.isLoaded) return;
+      const currentTime = status.positionMillis / 1000; // 밀리초 → 초 변환
       if (curIdx >= stopTimes.length) return;
-
-      console.log("currentTime: ", currentTime, "currentFrame: ", currentFrame);
+      console.log("currentTime: ", currentTime);
       if (currentTime >= stopTimes[curIdx]) {
         setIsPlaying(false);
         setShowSearchButtons(true);
@@ -77,13 +74,12 @@ const VideoPlayer = forwardRef(
     return (
       <Video
         ref={ref}
-        source={{
-          uri: "https://ai-shop-bucket.s3.ap-southeast-2.amazonaws.com/vod/vod_our_E10_1.mp4", //uri: videoUrl,
-        }}
-        style={[styles.video, productListVisible ? styles.small : ""]}
+        source={{ uri: videoUrl }}
+        style={[styles.video, productListVisible ? styles.small : null]}
         resizeMode="contain"
-        paused={!isPlaying}
-        onProgress={handleProgress}
+        // expo-av는 paused 대신 shouldPlay를 사용합니다.
+        shouldPlay={isPlaying}
+        onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
       />
     );
   }
@@ -92,10 +88,6 @@ const VideoPlayer = forwardRef(
 export default VideoPlayer;
 
 const styles = StyleSheet.create({
-  container: {
-    width: width,
-    height: (width * 9) / 16, // 4:3 비율
-  },
   video: {
     position: "absolute",
     width: "100%",
@@ -103,6 +95,6 @@ const styles = StyleSheet.create({
   },
   small: {
     width: (width * 7) / 10,
-    height: ((width * 7) / 10) * (9 / 16), /// 4:3 비율
+    height: ((width * 7) / 10) * (9 / 16),
   },
 });
