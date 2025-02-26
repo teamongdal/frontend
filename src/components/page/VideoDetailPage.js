@@ -306,6 +306,10 @@ const VideoDetailPage = ({ route }) => {
     setShowControls(true);
   };
 
+  const handleGoHighlight = () => {
+    navigation.navigate("HighLightPage", { user_id: "user_0001" });
+  };
+
   return (
     <View style={styles.container}>
       {/* <TouchableOpacity
@@ -377,6 +381,21 @@ const VideoDetailPage = ({ route }) => {
       )}
       {showSearchButtons && !productListVisible && (
         <View>
+          <TouchableOpacity
+            style={styles.captureButton}
+            onPress={handleGoHighlight}
+          >
+            <Image
+              source={require("../../assets/icon-highlight.png")}
+              style={styles.hightLightButton}
+            />
+            {/* <Icon
+              name="angle-up"
+              size={24}
+              color="#fff"
+              style={{ left: 10, top: 4 }}
+            /> */}
+          </TouchableOpacity>
           <Text style={styles.examTextWrap}>{textList[curTextIdx]}</Text>
           {recording == null ? (
             <TouchableOpacity
@@ -470,14 +489,21 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
   },
-
+  hightLightButton: {
+    padding: 5,
+    width: 100,
+    height: 100,
+    backgroundColor: "white",
+    borderRadius: 100,
+    left: "-300%",
+  },
   micButton: {
     padding: 5,
     width: 100,
     height: 100,
     backgroundColor: "white",
     borderRadius: 100,
-    right: -700,
+    right: "-750",
   },
   examTextWrap: {
     flexDirection: "row",
