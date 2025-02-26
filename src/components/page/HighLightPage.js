@@ -69,21 +69,22 @@ const HighlightScreen = () => {
 
 const styles = StyleSheet.create({
   screen: {
-    paddingTop: "10%",
+    paddingTop: "7%",
     flex: 1,
-    backgroundColor: "#000",
-    padding: 20,
+    backgroundColor: "#F6CECC",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   header: {
-    fontSize: 26,
+    fontSize: 60,
     fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 20,
+    color: "#1C3462",
+    left: 20,
+    marginBottom: 40,
   },
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
     // backgroundColor: "#1A1A1A", // 다크 배경색
     borderRadius: 15,
     padding: 10,
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
-    paddingBottom: 64,
+    paddingBottom: 40,
   },
   videoContainer: {
     flex: 1,
@@ -101,12 +102,14 @@ const styles = StyleSheet.create({
   },
   videoImage: {
     width: "100%",
-    height: width * 0.2, // 가로 너비의 25% 비율
+    height: width * 0.23, // 가로 너비의 25% 비율
     borderRadius: 10,
+    borderWidth: 5,
+    borderColor: "#1C3462",
   },
   productContainer: {
     flex: 1.5,
-    paddingLeft: 15,
+    paddingLeft: 35,
   },
 });
 
