@@ -59,7 +59,7 @@ const ProductInfo = ({ item }) => {
           >
             <Icon
               name={"heart"}
-              size={25}
+              size={30}
               color={isLike ? "#a11a32" : "gray"}
             />
           </TouchableOpacity>
@@ -71,7 +71,7 @@ const ProductInfo = ({ item }) => {
         <Text style={styles.discount}>
           {item.discount_rate == 0 ? "" : `${item.discount_rate}`}
         </Text>
-        <Text style={styles.price}>{item.final_price} 원</Text>
+        <Text style={styles.price}>{item.final_price}</Text>
       </View>
     </View>
   );
@@ -90,6 +90,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
+    borderWidth: 5,
+    borderColor: "#1C3462",
   },
   productImage: {
     width: 217,
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   brand: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: "bold",
     color: "#888",
   },
@@ -131,14 +133,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryText: {
-    fontSize: 16,
+    fontSize: 24,
     color: "#fff",
     fontWeight: "bold",
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
   productTitle: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
     marginBottom: 8,
   },
@@ -148,7 +150,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   price: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
   },
   heartButton: {
