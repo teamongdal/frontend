@@ -86,7 +86,7 @@ const VideoListPage = () => {
           showsHorizontalScrollIndicator={false}
           style={styles.scrollView}
         >
-          {videoList.map((data, index) => (
+          {videoList?.map((data, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => handleClickVideoItem(data.video_id)}

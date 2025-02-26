@@ -338,7 +338,7 @@ const VideoDetailPage = ({ route }) => {
         </ViewShot>
       </TouchableOpacity> */}
       <TouchableWithoutFeedback
-        onPress={handleScreenPress}
+        onPress={()=>{handleScreenPress()}}
         accessible={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -383,7 +383,7 @@ const VideoDetailPage = ({ route }) => {
         <View>
           <TouchableOpacity
             style={styles.captureButton}
-            onPress={handleGoHighlight}
+            onPress={()=>{handleGoHighlight()}}
           >
             <Image
               source={require("../../assets/icon-highlight.png")}
@@ -400,7 +400,7 @@ const VideoDetailPage = ({ route }) => {
           {recording == null ? (
             <TouchableOpacity
               style={styles.captureButton}
-              onPress={handleClickSearch}
+              onPress={()=>{handleClickSearch()}}
             >
               <Image
                 source={require("../../assets/voice.png")}
@@ -410,7 +410,7 @@ const VideoDetailPage = ({ route }) => {
           ) : (
             <TouchableOpacity
               style={styles.captureButton}
-              onPress={stopRecording}
+              onPress={()=>{stopRecording()}}
             >
               <Image
                 source={require("../../assets/unvoice.png")}
