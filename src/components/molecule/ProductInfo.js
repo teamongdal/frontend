@@ -1,15 +1,69 @@
-import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { server_url } from "../../api/function";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const ProductInfo = ({ item }) => {
+  const [isLike, setIsLike] = useState(null);
+
+  useEffect(() => {
+    if (item && item.is_like !== undefined) {
+      setIsLike(item.is_like);
+    }
+  }, [item]);
+
+  const handleClickLike = async () => {
+    try {
+      const action = isLike ? "product_unlike" : "product_like";
+      const response = await fetch(
+        `${server_url}/api/${action}?user_id=user_0001&product_code=${item.product_code}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`서버 응답 실패: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("API 응답 데이터:", data);
+
+      setIsLike(!isLike);
+    } catch (error) {
+      console.error("좋아요 실패:", error);
+    }
+  };
   return (
     <View style={styles.productContainer}>
       <Image
-        source={{ uri: item.product_image_url }}
+        source={{ uri: item.product_image_url ?? "" }}
         style={styles.productImage}
       />
       <View style={styles.productInfo}>
-        <Text style={styles.brand}>{item.brand_name}</Text>
+        <View style={styles.infoWrap}>
+          <View style={styles.brandWrap}>
+            <Image
+              source={{ uri: item.brand_image ?? "" }}
+              style={styles.brandImage}
+            />
+            <Text style={styles.brand}>{item.brand_name}</Text>
+          </View>
+          {/* 좋아요 */}
+          <TouchableOpacity
+            style={styles.heartButton}
+            onPress={handleClickLike}
+          >
+            <Icon
+              name={"heart"}
+              size={25}
+              color={isLike ? "#a11a32" : "gray"}
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.categoryTag}>
           <Text style={styles.categoryText}>{item.category}</Text>
         </View>
@@ -47,11 +101,26 @@ const styles = StyleSheet.create({
   productInfo: {
     flex: 1,
   },
+  infoWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  brandWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  brandImage: {
+    width: 40,
+    height: 40,
+    marginRight: 12,
+    resizeMode: "contain",
+  },
   brand: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#888",
-    marginBottom: 16,
   },
   categoryTag: {
     backgroundColor: "#6C3641",
@@ -81,6 +150,13 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 24,
     fontWeight: "bold",
+  },
+  heartButton: {
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 50,
+    height: 50,
   },
 });
 

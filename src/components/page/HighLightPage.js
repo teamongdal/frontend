@@ -18,7 +18,7 @@ const renderItem = ({ item }) => {
       {/* 영상 장면 (왼쪽) */}
       <View style={styles.videoContainer}>
         <Image
-          source={{ uri: item.highlight_image_url.replace(/^C:\//, "/") }}
+          source={{ uri: item.highlight_image_url?.replace(/^C:\//, "/") }}
           style={styles.videoImage}
         />
       </View>
@@ -40,7 +40,9 @@ const HighlightScreen = () => {
   }, [highlightData]);
 
   useEffect(() => {
-    fetch(`${server_url}/api/all_product_list?video_id=video_0001`)
+    fetch(
+      `${server_url}/api/all_product_list?video_id=video_0001&user_id=user_0001`
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log("data: ", data);
