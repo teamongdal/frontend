@@ -18,7 +18,7 @@ const renderItem = ({ item }) => {
       {/* 영상 장면 (왼쪽) */}
       <View style={styles.videoContainer}>
         <Image
-          source={{ uri: item.highlight_image_url?.replace(/^C:\//, "/") }}
+          source={{ uri: item.highlight_image_url }}
           style={styles.videoImage}
         />
       </View>
@@ -34,10 +34,6 @@ const renderItem = ({ item }) => {
 const HighlightScreen = () => {
   const [highlightData, setHighlightData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    console.log("highlightData: ", highlightData);
-  }, [highlightData]);
 
   useEffect(() => {
     fetch(
