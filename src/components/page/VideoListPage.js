@@ -93,7 +93,7 @@ const VideoListPage = () => {
             >
               <View style={styles.card}>
                 <Image
-                  source={{ uri: data.video_image.replace(/^C:\//, "/") }}
+                  source={{ uri: data.video_image }}
                   style={styles.image}
                 />
                 <View style={styles.textContainer}>
@@ -161,26 +161,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   card: {
-    width: width * 0.21,
-    height: width * 0.35,
+    width: width * 0.4,
+    height: width * 0.23,
     marginRight: width * 0.03,
     borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: "#222",
+    // borderColor: "#222",
+    borderWidth: 4,
   },
   image: {
     width: "100%",
-    height: "85%",
+    height: "100%",
     resizeMode: "cover",
   },
   textContainer: {
     paddingHorizontal: 8,
+    paddingVertical: 10,
     alignItems: "center",
-    paddingTop: "20",
   },
   text: {
     color: "white",
-    fontSize: width * 0.018,
+    fontSize: width * 0.023,
     fontWeight: "600",
     textAlign: "center",
   },
