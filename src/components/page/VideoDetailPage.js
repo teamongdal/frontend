@@ -39,14 +39,14 @@ const VideoDetailPage = ({ route }) => {
   const [isRetry, setIsRetry] = useState(false);
   const [retryText, setRetryText] = useState("");
   const [currentTime, setCurrentTime] = useState("");
-  const [curTextIdx, setCurTextIdx] = useState(0);
+  // const [curTextIdx, setCurTextIdx] = useState(0);
   // const fadeAnim = useRef(new Animated.Value(1)).current;
   const textExample = "발화 예시: 가운데 옷 정보 알려줘";
   const [curIdx, setCurIdx] = useState(0);
 
-  useEffect(() => {
-    console.log("currentTime", currentTime);
-  }, [currentTime]);
+  // useEffect(() => {
+  //   console.log("currentTime", currentTime);
+  // }, [currentTime]);
 
   useEffect(() => {
     if (videoData) {
@@ -84,7 +84,7 @@ const VideoDetailPage = ({ route }) => {
 
   // expo-av Video에서는 pauseAsync() 사용
   const handleClickSearch = async () => {
-    console.log("handleClickSearch clicked");
+    // console.log("handleClickSearch clicked");
     if (videoRef.current && videoRef.current.pauseAsync) {
       try {
         await videoRef.current.pauseAsync();
@@ -158,12 +158,12 @@ const VideoDetailPage = ({ route }) => {
         return;
       }
 
-      console.log("stopRecording clicked");
+      // console.log("stopRecording clicked");
       await recording.stopAndUnloadAsync(); // 실제 녹음 중단
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
 
       const uri = recording.getURI();
-      console.log("Recording stopped, URI:", uri);
+      // console.log("Recording stopped, URI:", uri);
 
       // 녹음 인스턴스 상태 리셋
       setRecording(null);
@@ -228,7 +228,7 @@ const VideoDetailPage = ({ route }) => {
   // }
 
   const closeProductList = () => {
-    console.log("close 클릭");
+    // console.log("close 클릭");
     setProductListVisible(false);
     setIsPlaying(false);
 
