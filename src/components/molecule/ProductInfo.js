@@ -3,7 +3,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { server_url } from "../../api/function";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const ProductInfo = ({ item }) => {
+const ProductInfo = ({ item, isFilterEnabled }) => {
+  const styles = isFilterEnabled ? styles1 : styles2;
   const [isLike, setIsLike] = useState(null);
 
   useEffect(() => {
@@ -37,6 +38,7 @@ const ProductInfo = ({ item }) => {
       console.error("좋아요 실패:", error);
     }
   };
+
   return (
     <View style={styles.productContainer}>
       <Image
@@ -52,32 +54,30 @@ const ProductInfo = ({ item }) => {
             />
             <Text style={styles.brand}>{item.brand_name}</Text>
           </View>
-          {/* 좋아요 */}
+          {/* 좋아요 버튼 */}
           <TouchableOpacity
             style={styles.heartButton}
-            onPress={handleClickLike}
+            onPress={() => {
+              handleClickLike();
+            }}
           >
-            <Icon
-              name={"heart"}
-              size={30}
-              color={isLike ? "#a11a32" : "gray"}
-            />
+            <Icon name={"heart"} size={30} color={"gray"} />
           </TouchableOpacity>
         </View>
         <View style={styles.categoryTag}>
           <Text style={styles.categoryText}>{item.category}</Text>
         </View>
         <Text style={styles.productTitle}>{item.product_name}</Text>
-        <Text style={styles.discount}>
-          {item.discount_rate == 0 ? "" : `${item.discount_rate}`}
-        </Text>
+        {item.discount_rate != "0%" && item.discount_rate != "0" && (
+          <Text style={styles.discount}>{item.discount_rate}</Text>
+        )}
         <Text style={styles.price}>{item.final_price}</Text>
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles1 = StyleSheet.create({
   productContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
   brandWrap: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
   },
   brandImage: {
     width: 40,
@@ -162,4 +161,86 @@ const styles = StyleSheet.create({
   },
 });
 
+const styles2 = StyleSheet.create({
+  productContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 29,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    marginHorizontal: 20,
+  },
+  productImage: {
+    width: 177,
+    height: 177,
+    borderRadius: 10,
+    marginRight: 26,
+  },
+  infoWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  brandWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  productInfo: {
+    flex: 1,
+  },
+  brandImage: {
+    width: 40,
+    height: 40,
+    marginRight: 12,
+    marginBottom: 12,
+    resizeMode: "contain",
+  },
+  brand: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#888",
+    marginBottom: 16,
+  },
+  categoryTag: {
+    backgroundColor: "#6C3641",
+    paddingVertical: 3,
+    paddingHorizontal: 5,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+    marginBottom: 12,
+  },
+  categoryText: {
+    fontSize: 14,
+    color: "#fff",
+    fontWeight: "bold",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  productTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  discount: {
+    fontSize: 20,
+    color: "red",
+    fontWeight: "bold",
+  },
+  price: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  heartButton: {
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 50,
+    height: 50,
+  },
+});
 export default ProductInfo;
