@@ -75,7 +75,7 @@ const VideoListPage = () => {
             Find the Dupe, Own the Style
           </Text>
           <Text style={styles.headerSubtitle}>
-            셀럽의 스타일을 합리적인 가격대의 듀프로 지금 만나보세요
+            영상 속 스타일을 합리적인 가격대의 듀프로 만나보세요
           </Text>
         </View>
         <Text style={styles.title}>컨텐츠</Text>

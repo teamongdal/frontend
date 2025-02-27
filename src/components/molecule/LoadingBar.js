@@ -10,8 +10,20 @@ import {
 } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 const { width, height } = Dimensions.get("window");
-const LoadingBar = ({ capturedImage }) => {
+const LoadingBar = ({ capturedImage, curIdx }) => {
   const progress = useRef(new Animated.Value(0)).current;
+
+  const images = {
+    0: require("../../assets/video_0001_0001.png"),
+    1: require("../../assets/video_0001_0002.png"),
+    2: require("../../assets/video_0001_0001.png"),
+    3: require("../../assets/video_0001_0002.png"),
+    4: require("../../assets/video_0001_0001.png"),
+    5: require("../../assets/video_0001_0002.png"),
+    6: require("../../assets/video_0001_0001.png"),
+    7: require("../../assets/video_0001_0002.png"),
+  };
+  const imageSource = images[curIdx];
 
   useEffect(() => {
     Animated.loop(
@@ -62,7 +74,8 @@ const LoadingBar = ({ capturedImage }) => {
             />
           </Svg>
           <Image
-            source={{ uri: capturedImage }}
+            source={imageSource}
+            // source={{ uri: capturedImage }}
             style={styles.image}
             resizeMode="cover"
           />

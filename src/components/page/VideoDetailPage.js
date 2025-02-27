@@ -38,28 +38,15 @@ const VideoDetailPage = ({ route }) => {
   const [showControls, setShowControls] = useState(true);
   const [isRetry, setIsRetry] = useState(false);
   const [retryText, setRetryText] = useState("");
-
-  const textList = ["가운데 옷 정보 알려줘", "왼쪽 옷 정보 알려줘"];
+  const [currentTime, setCurrentTime] = useState("");
   const [curTextIdx, setCurTextIdx] = useState(0);
-
-  const fadeAnim = useRef(new Animated.Value(1)).current;
+  // const fadeAnim = useRef(new Animated.Value(1)).current;
+  const textExample = "발화 예시: 가운데 옷 정보 알려줘";
+  const [curIdx, setCurIdx] = useState(0);
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 5000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 5000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [fadeAnim]);
+    console.log("currentTime", currentTime);
+  }, [currentTime]);
 
   useEffect(() => {
     if (videoData) {
@@ -68,14 +55,6 @@ const VideoDetailPage = ({ route }) => {
   }, [videoData]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurTextIdx((prevIndex) => (prevIndex + 1) % textList.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    console.log("isRetry", isRetry);
     if (isRetry) {
       if (isPlaying) {
         setIsPlaying(false);
@@ -118,12 +97,22 @@ const VideoDetailPage = ({ route }) => {
     startRecording();
   };
 
+  // startRecording
   async function startRecording() {
     try {
+      // 이미 녹음 중이면 새 녹음 시작하지 않도록 가드
+      if (recording) {
+        console.log("Already recording. Not starting a new one.");
+        return;
+      }
+
+      // 권한 체크
       if (permissionResponse.status !== "granted") {
         console.log("Requesting permission..");
         await requestPermission();
       }
+
+      // iOS에서 녹음 가능하도록 Audio 모드 설정
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
@@ -151,30 +140,101 @@ const VideoDetailPage = ({ route }) => {
       const recordingInstance = new Audio.Recording();
       await recordingInstance.prepareToRecordAsync(recordingOptions);
       await recordingInstance.startAsync();
-      setRecording(recordingInstance);
+      setRecording(recordingInstance); // 녹음 인스턴스 상태 저장
+
+      // 화면 캡처
       handleCapture();
     } catch (err) {
       console.error("Failed to start recording", err);
     }
   }
 
+  // stopRecording
   async function stopRecording() {
-    console.log("stopRecording clicked");
-    setRecording(undefined);
-    await recording.stopAndUnloadAsync();
-    await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
-    const uri = recording.getURI();
-    console.log("Recording stopped, URI:", uri);
-    sendAudioToServer(uri);
-    setIsLoading(true);
+    try {
+      // 녹음 중이 아니라면 중단 로직 수행하지 않도록 가드
+      if (!recording) {
+        console.log("No recording in progress. Doing nothing.");
+        return;
+      }
+
+      console.log("stopRecording clicked");
+      await recording.stopAndUnloadAsync(); // 실제 녹음 중단
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+
+      const uri = recording.getURI();
+      console.log("Recording stopped, URI:", uri);
+
+      // 녹음 인스턴스 상태 리셋
+      setRecording(null);
+
+      // 서버에 오디오 파일 전송
+      sendAudioToServer(uri);
+      setIsLoading(true);
+    } catch (error) {
+      console.error("Error stopping recording:", error);
+    }
   }
+
+  // async function startRecording() {
+  //   try {
+  //     if (permissionResponse.status !== "granted") {
+  //       console.log("Requesting permission..");
+  //       await requestPermission();
+  //     }
+  //     await Audio.setAudioModeAsync({
+  //       allowsRecordingIOS: true,
+  //       playsInSilentModeIOS: true,
+  //     });
+
+  //     const recordingOptions = {
+  //       android: {
+  //         extension: ".m4a",
+  //         outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+  //         audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+  //         sampleRate: 44100,
+  //         numberOfChannels: 1,
+  //         bitRate: 128000,
+  //       },
+  //       ios: {
+  //         extension: ".wav",
+  //         outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
+  //         audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
+  //         sampleRate: 44100,
+  //         numberOfChannels: 1,
+  //         bitRate: 128000,
+  //       },
+  //     };
+
+  //     const recordingInstance = new Audio.Recording();
+  //     await recordingInstance.prepareToRecordAsync(recordingOptions);
+  //     await recordingInstance.startAsync();
+  //     setRecording(recordingInstance);
+  //     handleCapture();
+  //   } catch (err) {
+  //     console.error("Failed to start recording", err);
+  //   }
+  // }
+
+  // async function stopRecording() {
+  //   console.log("stopRecording clicked");
+  //   setRecording(undefined);
+  //   await recording.stopAndUnloadAsync();
+  //   await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+  //   const uri = recording.getURI();
+  //   console.log("Recording stopped, URI:", uri);
+  //   sendAudioToServer(uri);
+  //   setIsLoading(true);
+  // }
 
   const closeProductList = () => {
     console.log("close 클릭");
     setProductListVisible(false);
-    if (!isPlaying) {
-      setIsPlaying(true);
-    }
+    setIsPlaying(false);
+
+    // if (!isPlaying) {
+    //   setIsPlaying(true);
+    // }
   };
 
   const sendAudioToServer = async (audioUri) => {
@@ -194,7 +254,7 @@ const VideoDetailPage = ({ route }) => {
       });
 
       const searchResponse = await fetch(
-        `${server_url}/api/search_product?user_id=user_0001`,
+        `${server_url}/api/search_product?user_id=user_0001&time=${currentTime}&video_id=${videoId}`,
         {
           method: "POST",
           body: formData,
@@ -207,12 +267,13 @@ const VideoDetailPage = ({ route }) => {
       }
 
       const searchData = await searchResponse.json();
-      console.log("searchData", searchData);
+      // console.log("searchData", searchData);
       if (searchData?.success) {
         setProductList(searchData?.product_list);
         setProductListVisible(true);
         setIsPlaying(false);
         setIsLoading(false);
+        setCurIdx((prevIdx) => prevIdx + 1);
       } else {
         setRetryText(
           searchData?.user_prompt_original === "No speech detected."
@@ -250,6 +311,10 @@ const VideoDetailPage = ({ route }) => {
     navigation.navigate("HighLightPage", { user_id: "user_0001" });
   };
 
+  useEffect(() => {
+    console.log("currentTime", currentTime);
+  }, [currentTime]);
+
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback
@@ -274,6 +339,8 @@ const VideoDetailPage = ({ route }) => {
                 setShowSearchButtons={setShowSearchButtons}
                 setShowControls={setShowControls}
                 showControls={showControls}
+                currentTime={currentTime}
+                setCurrentTime={setCurrentTime}
               />
             ) : (
               <View
@@ -297,7 +364,6 @@ const VideoDetailPage = ({ route }) => {
             productListVisible ? styles.smallView : null,
           ]}
           onPress={() => {
-            console.log("click!");
             setIsPlaying((prev) => !prev);
           }}
         >
@@ -315,9 +381,9 @@ const VideoDetailPage = ({ route }) => {
               style={styles.hightLightButton}
             />
           </TouchableOpacity>
-          <Animated.Text style={[styles.examTextWrap, { opacity: fadeAnim }]}>
-            <Text>{textList[curTextIdx]}</Text>
-          </Animated.Text>
+          {/* <Animated.Text style={[styles.examTextWrap, { opacity: fadeAnim }]}> */}
+          <Text style={styles.examTextWrap}>{textExample}</Text>
+          {/* </Animated.Text> */}
           {recording == null ? (
             <TouchableOpacity
               style={styles.micButtonContainer}
@@ -341,7 +407,10 @@ const VideoDetailPage = ({ route }) => {
           )}
         </View>
       )}
-      {isLoading && <LoadingScreen capturedImage={capturedImage} />}
+
+      {isLoading && (
+        <LoadingScreen capturedImage={capturedImage} curIdx={curIdx} />
+      )}
       {isRetry && (
         <RetryAlertPage setIsRetry={setIsRetry} retryText={retryText} />
       )}
@@ -420,7 +489,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     paddingVertical: 15,
     paddingHorizontal: 50,
-    width: 370,
+    width: 420,
     borderRadius: 100,
     borderWidth: 2,
     // borderColor: "#a11a32",
@@ -429,7 +498,7 @@ const styles = StyleSheet.create({
   },
   playPauseButton: {
     position: "absolute",
-    top: "35%",
+    top: "40%",
     left: "50%",
     transform: [{ translateX: -30 }],
     backgroundColor: "rgba(0, 0, 0, 0.5)",
