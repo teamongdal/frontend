@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   watchButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#e50914",
+    backgroundColor: "#a11a32",
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 32,

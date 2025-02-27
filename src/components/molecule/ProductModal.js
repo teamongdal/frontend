@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   Animated,
+  Linking,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import ProductCarousel from "../molecule/ProductCarousel";
@@ -22,7 +23,6 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
 
   useEffect(() => {
     if (selectedProduct && selectedProduct.is_like !== undefined) {
-      console.log("selectedProduct: ", selectedProduct);
       setIsLike(selectedProduct.is_like);
     }
   }, [selectedProduct]);
@@ -65,12 +65,14 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
       }
 
       const data = await response.json();
-      console.log("API 응답 데이터:", data);
-
       setIsLike(!isLike);
     } catch (error) {
       console.error("좋아요 실패:", error);
     }
+  };
+
+  const handleGoShopping = () => {
+    Linking.openURL(selectedProduct.detail_url);
   };
 
   return (
@@ -113,8 +115,11 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                   <Text style={styles.brandName}>
                     {selectedProduct?.brand_name}
                   </Text>
+                  <Image
+                    source={require("../../assets/icon-star.png")}
+                    style={styles.iconStar}
+                  />
                   <Text style={styles.rating}>
-                    ⭐
                     {selectedProduct.review_rating ??
                     selectedProduct.review_rating == "없음"
                       ? Math.floor(
@@ -138,7 +143,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
 
                 {/* 가격 정보 */}
                 <View style={styles.priceContainer}>
-                  {selectedProduct?.discount_rate !== "0" && (
+                  {selectedProduct?.discount_rate !== "0%" && (
                     <Text style={styles.discount}>
                       {selectedProduct.discount_rate}
                     </Text>
@@ -169,16 +174,16 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                 {/* 설명 박스 */}
                 <View style={[styles.detailsBox]}>
                   <Text style={styles.detailsText}>
-                    <Icon name="plus-circle" size={14} color="#fff" />
+                    <Image
+                      source={require("../../assets/icon-robot.png")}
+                      style={styles.iconRobot}
+                    />
                     <Text style={styles.detailsHighlight}>
-                      클래식과 트렌드의 완벽한 조화
+                      {"   AI 리뷰 요약  "}
                     </Text>
                   </Text>
                   <Text style={styles.detailsContent}>
-                    리바이스의 시그니처 트러커 재킷 디자인에 코듀로이 소재를
-                    더해 클래식하면서도 트렌디한 무드를 완성했습니다. 어떤
-                    스타일에도 쉽게 매치할 수 있어 데일리룩부터 캐주얼룩까지
-                    활용도가 높습니다.
+                    {selectedProduct.reviews[0]}
                   </Text>
                 </View>
               </View>
@@ -197,9 +202,9 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.confirmButton}
-                  onPress={closeModal}
+                  onPress={handleGoShopping}
                 >
-                  <Text style={styles.confirmButtonText}>확인</Text>
+                  <Text style={styles.confirmButtonText}>상품 바로가기</Text>
                 </TouchableOpacity>
               </View>
             </Animated.View>
@@ -220,7 +225,7 @@ const styles = {
     // backgroundColor: "rgba(0, 0, 0, 0.3)", // 배경 어둡게 처리
   },
   modalContainer: {
-    top: "-170%",
+    top: "-200%",
     width: "30%",
     height: "100%",
     // backgroundColor: "#1a1a1a",
@@ -239,13 +244,6 @@ const styles = {
     padding: 8,
     borderRadius: 50,
   },
-  productImage: {
-    width: "100%",
-    left: 10,
-    resizeMode: "cover",
-    borderRadius: 10,
-  },
-
   infoContainer: {
     padding: 16,
     marginTop: 12,
@@ -261,6 +259,7 @@ const styles = {
     height: 20,
     borderRadius: 15,
     marginRight: 10,
+    backgroundColor: "white",
   },
   brandName: {
     fontSize: 16,
@@ -269,9 +268,21 @@ const styles = {
     width: 316,
     flex: 1,
   },
+  iconStar: {
+    width: 16,
+    height: 16,
+    marginRight: 4,
+    marginBottom: 4,
+  },
+  iconRobot: {
+    width: 20,
+    height: 20,
+  },
   rating: {
     fontSize: 14,
     color: "#ffd700",
+    marginBottom: 5,
+    paddingLeft: 5,
   },
   productImage: {
     width: width * 0.25,
@@ -336,11 +347,13 @@ const styles = {
     marginBottom: 14,
     marginTop: 12,
     lineHeight: 18,
+    justifyContent: "center",
   },
   detailsHighlight: {
-    marginTop: 10,
     fontWeight: "bold",
     color: "#fff",
+    fontSize: 17,
+    paddingBottom: 10,
   },
   detailsContent: {
     fontSize: 18,
@@ -348,11 +361,15 @@ const styles = {
     lineHeight: 22,
     marginTop: 5,
     width: "330",
+    height: "20",
   },
-
+  reviewContainer: {
+    marginTop: -30,
+  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 15,
     width: "370",
   },

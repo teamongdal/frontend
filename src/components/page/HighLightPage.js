@@ -18,7 +18,6 @@ const HighlightScreen = () => {
   const [isFilterEnabled, setIsFilterEnabled] = useState(false);
 
   const renderItem = ({ item }) => {
-    console.log("item", item);
     return (
       <View style={currentStyles.itemContainer}>
         {/* 영상 장면 (왼쪽) */}
@@ -43,7 +42,6 @@ const HighlightScreen = () => {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log("data: ", data);
         setHighlightData(data.all_product_list);
       })
       .catch((error) => {
@@ -120,7 +118,7 @@ const styles1 = StyleSheet.create({
     width: "100%",
     height: width * 0.25,
     borderRadius: 10,
-    borderWidth: 5,
+    borderWidth: 17,
     borderColor: "#1C3462",
   },
   productContainer: {

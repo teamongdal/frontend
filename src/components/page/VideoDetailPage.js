@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   TouchableWithoutFeedback,
+  Animated,
 } from "react-native";
 import VideoPlayer from "../molecule/VideoPlayer"; // expo-av 기반 VideoPlayer
 import ViewShot, { captureRef } from "react-native-view-shot";
@@ -41,6 +42,25 @@ const VideoDetailPage = ({ route }) => {
   const textList = ["가운데 옷 정보 알려줘", "왼쪽 옷 정보 알려줘"];
   const [curTextIdx, setCurTextIdx] = useState(0);
 
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 5000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 5000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [fadeAnim]);
+
   useEffect(() => {
     if (videoData) {
       setShowSearchButtons(true);
@@ -50,7 +70,7 @@ const VideoDetailPage = ({ route }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurTextIdx((prevIndex) => (prevIndex + 1) % textList.length);
-    }, 2000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -64,10 +84,6 @@ const VideoDetailPage = ({ route }) => {
       setProductListVisible(false);
     }
   }, [isRetry]);
-
-  useEffect(() => {
-    console.log("videoData", videoData);
-  }, [videoData]);
 
   useEffect(() => {
     if (productListVisible) {
@@ -112,7 +128,7 @@ const VideoDetailPage = ({ route }) => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      // 녹음 옵션: Android는 m4a, iOS는 WAV(LinearPCM)
+
       const recordingOptions = {
         android: {
           extension: ".m4a",
@@ -169,7 +185,7 @@ const VideoDetailPage = ({ route }) => {
         name: "captured_image.png",
         type: "image/png",
       });
-      // 파일 타입 결정: iOS produces .wav, Android produces .m4a
+
       const fileType = audioUri.endsWith(".wav") ? "audio/wav" : "audio/m4a";
       formData.append("audio", {
         uri: audioUri.startsWith("file://") ? audioUri : `file://${audioUri}`,
@@ -206,7 +222,10 @@ const VideoDetailPage = ({ route }) => {
         setIsRetry(true);
       }
     } catch (error) {
-      console.error("Error sending audio:", error.response?.data || error.message);
+      console.error(
+        "Error sending audio:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -257,8 +276,15 @@ const VideoDetailPage = ({ route }) => {
                 showControls={showControls}
               />
             ) : (
-              <View style={[styles.videoContainer, { justifyContent: "center", alignItems: "center" }]}>
-                <Text style={{ color: "white" }}>재생할 비디오 데이터가 없습니다.</Text>
+              <View
+                style={[
+                  styles.videoContainer,
+                  { justifyContent: "center", alignItems: "center" },
+                ]}
+              >
+                <Text style={{ color: "white" }}>
+                  재생할 비디오 데이터가 없습니다.
+                </Text>
               </View>
             )}
           </ViewShot>
@@ -266,7 +292,10 @@ const VideoDetailPage = ({ route }) => {
       </TouchableWithoutFeedback>
       {showControls && (
         <TouchableOpacity
-          style={[styles.playPauseButton, productListVisible ? styles.smallView : null]}
+          style={[
+            styles.playPauseButton,
+            productListVisible ? styles.smallView : null,
+          ]}
           onPress={() => {
             console.log("click!");
             setIsPlaying((prev) => !prev);
@@ -276,23 +305,34 @@ const VideoDetailPage = ({ route }) => {
         </TouchableOpacity>
       )}
       {showSearchButtons && !productListVisible && (
-        <View>
-          <TouchableOpacity style={styles.captureButton} onPress={handleGoHighlight}>
+        <View style={styles.searchButtonsWrap}>
+          <TouchableOpacity
+            style={styles.highlightButtonWrap}
+            onPress={handleGoHighlight}
+          >
             <Image
               source={require("../../assets/icon-highlight.png")}
               style={styles.hightLightButton}
             />
           </TouchableOpacity>
-          <Text style={styles.examTextWrap}>{textList[curTextIdx]}</Text>
+          <Animated.Text style={[styles.examTextWrap, { opacity: fadeAnim }]}>
+            <Text>{textList[curTextIdx]}</Text>
+          </Animated.Text>
           {recording == null ? (
-            <TouchableOpacity style={styles.micButtonContainer} onPress={handleClickSearch}>
+            <TouchableOpacity
+              style={styles.micButtonContainer}
+              onPress={handleClickSearch}
+            >
               <Image
                 source={require("../../assets/voice.png")}
                 style={styles.micButton}
               />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.micButtonContainer} onPress={stopRecording}>
+            <TouchableOpacity
+              style={styles.micButtonContainer}
+              onPress={stopRecording}
+            >
               <Image
                 source={require("../../assets/unvoice.png")}
                 style={styles.micButton}
@@ -302,7 +342,9 @@ const VideoDetailPage = ({ route }) => {
         </View>
       )}
       {isLoading && <LoadingScreen capturedImage={capturedImage} />}
-      {isRetry && <RetryAlertPage setIsRetry={setIsRetry} retryText={retryText} />}
+      {isRetry && (
+        <RetryAlertPage setIsRetry={setIsRetry} retryText={retryText} />
+      )}
       {productListVisible && productList && (
         <ProductListTestPage
           productList={productList}
@@ -321,6 +363,7 @@ const VideoDetailPage = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: "2%",
     backgroundColor: "#000",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -332,25 +375,30 @@ const styles = StyleSheet.create({
     height: (width * 9) / 16,
     backgroundColor: "black",
   },
-  captureButton: {
-    position: "absolute",
-    bottom: "20%",
-    left: "-8%",
+  searchButtonsWrap: {
+    flexDirection: "row",
+    alignItems: "center", // 수직(Vertical) 가운데 정렬
+    justifyContent: "center", // 수평(Horizontal) 가운데 정렬
+    bottom: "5%",
+  },
+  highlightButtonWrap: {
+    // position: "absolute",
+    left: "-25%",
     padding: 12,
+    paddingVertical: "20",
     borderRadius: 8,
   },
   hightLightButton: {
-    padding: 5,
     width: 100,
     height: 100,
-    backgroundColor: "white",
+    // backgroundColor: "white",
     borderRadius: 100,
-    left: "-300%",
+    // left: "-300%",
   },
   micButtonContainer: {
-    position: "absolute",
-    bottom: "20%",
-    right: -350, // 마이크 아이콘이 보이도록
+    // position: "absolute",
+    // bottom: "20%",
+    right: "-25%",
     width: 100,
     height: 100,
   },
@@ -369,14 +417,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     left: 0,
     marginTop: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    padding: 5,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    paddingVertical: 15,
     paddingHorizontal: 50,
     width: 370,
     borderRadius: 100,
     borderWidth: 2,
-    borderColor: "#a11a32",
+    // borderColor: "#a11a32",
     marginBottom: 50,
+    marginTop: 50,
   },
   playPauseButton: {
     position: "absolute",
