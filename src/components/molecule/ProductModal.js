@@ -182,7 +182,7 @@ const ProductModal = ({ modalVisible, closeModal, selectedProduct }) => {
                       {"   AI 리뷰 요약  "}
                     </Text>
                   </Text>
-                  <Text style={styles.detailsContent}>
+                  <Text style={styles.detailsContent} numberOfLines={4}>
                     {selectedProduct.reviews[0]}
                   </Text>
                 </View>
@@ -246,7 +246,7 @@ const styles = {
   },
   infoContainer: {
     padding: 16,
-    marginTop: 12,
+    marginTop: 30,
     width: "370",
   },
   brandContainer: {
@@ -324,7 +324,7 @@ const styles = {
     color: "#fff",
   },
   detailsTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#fff",
     marginBottom: 10,
@@ -360,8 +360,8 @@ const styles = {
     color: "#ddd",
     lineHeight: 22,
     marginTop: 5,
-    width: "330",
-    height: "20",
+    width: "100%",
+    height: "70",
   },
   reviewContainer: {
     marginTop: -30,

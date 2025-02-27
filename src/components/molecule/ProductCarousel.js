@@ -74,11 +74,14 @@ const ProductCarousel = ({ images }) => {
 const styles = StyleSheet.create({
   carouselContainer: {
     left: "23%",
+    top: "10%",
   },
   productImage: {
     width: width * 0.25,
-    height: "100%",
-    left: 20,
+    height: height * 0.45,
+    resizeMode: "cover",
+    borderRadius: 10,
+    marginLeft: 15,
   },
   arrowLeft: {
     position: "absolute",
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
   },
   arrowRight: {
     position: "absolute",
-    right: -370,
+    right: -360,
     zIndex: 10,
     top: "45%",
     padding: 10,
@@ -98,7 +101,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     position: "absolute",
     bottom: 10,
-    left: 180,
+    left: 160,
     alignSelf: "center",
   },
   dot: {

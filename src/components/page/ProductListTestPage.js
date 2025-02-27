@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingTop: "29%",
+    paddingTop: "35%",
     padding: 20,
     pointerEvents: "auto",
   },

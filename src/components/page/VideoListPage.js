@@ -70,12 +70,12 @@ const VideoListPage = () => {
           style={styles.bannerImage}
         />
         <View style={styles.textWrap}>
-          <Text style={styles.headerTitle}>Google Play 무비</Text>
+          <Text style={styles.headerTitle}>SUPER DUPER </Text>
           <Text style={styles.headerSubtitle}>
-            TV에서 보면 더 커지는 즐거움!
+            Find the Dupe, Own the Style
           </Text>
           <Text style={styles.headerSubtitle}>
-            Google이 제공하는 다양한 게임과 앱을 지금 만나보세요
+            셀럽의 스타일을 합리적인 가격대의 듀프로 지금 만나보세요
           </Text>
         </View>
         <Text style={styles.title}>컨텐츠</Text>
@@ -86,7 +86,7 @@ const VideoListPage = () => {
           showsHorizontalScrollIndicator={false}
           style={styles.scrollView}
         >
-          {videoList?.map((data, index) => (
+          {videoList?.slice(0, 2).map((data, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => handleClickVideoItem(data.video_id)}
