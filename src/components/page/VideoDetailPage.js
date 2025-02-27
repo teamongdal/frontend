@@ -64,11 +64,12 @@ const VideoDetailPage = ({ route }) => {
     }
   }, [isRetry]);
 
-  useEffect(() => {
-    if (productListVisible) {
-      setIsPlaying(true);
-    }
-  }, [productListVisible]);
+  //프로젝트 자동 재생
+  // useEffect(() => {
+  //   if (productListVisible) {
+  //     setIsPlaying(true);
+  //   }
+  // }, [productListVisible]);
 
   useEffect(() => {
     if (!videoId) return;

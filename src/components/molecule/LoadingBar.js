@@ -15,8 +15,8 @@ const LoadingBar = ({ capturedImage, curIdx }) => {
 
   const images = {
     0: require("../../assets/video_0001_0001.png"),
-    1: require("../../assets/video_0001_0002.png"),
-    2: require("../../assets/video_0001_0001.png"),
+    1: require("../../assets/video_0001_0001.png"),
+    2: require("../../assets/video_0001_0002.png"),
     3: require("../../assets/video_0001_0002.png"),
     4: require("../../assets/video_0001_0001.png"),
     5: require("../../assets/video_0001_0002.png"),
