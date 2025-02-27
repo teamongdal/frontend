@@ -64,7 +64,7 @@ const WishlistPage = () => {
       .then((data) => {
         setCartItems(data.cart_list || []);
         setIsLoading(false);
-        console.log("data.cart_list: ", data.cart_list);
+        console.log("=======data.cart_list: ======", data.cart_list[0]);
       })
       .catch((error) => {
         console.error("API 요청 실패:", error);
@@ -179,7 +179,10 @@ const WishlistPage = () => {
           <View style={styles.itemContainer}>
             {/* 이미지 + 체크박스 */}
             <View style={styles.imageWrapper}>
-              <Image source={{ uri: item.product_image }} style={styles.image} />
+              <Image
+                source={{ uri: item.product_image }}
+                style={styles.image}
+              />
               {/* ★ 수정: <CheckBox> → <Checkbox> */}
               <Checkbox
                 value={deleteItemList.includes(item.product_code)}
@@ -188,10 +191,14 @@ const WishlistPage = () => {
               />
             </View>
             <Text style={styles.brand}>{item.brand_name}</Text>
-            <Text style={styles.productName}>{item.product_name}</Text>
+            <Text style={styles.productName} numberOfLines={2}>
+              {item.product_name}
+            </Text>
             <View style={styles.priceContainer}>
               <Text style={styles.discount}>
-                {item.discount_rate === 0 ? "" : item.discount_rate}
+                {item.discount_rate === "0" || item.discount_rate === "0%"
+                  ? ""
+                  : item.discount_rate}
               </Text>
               <Text style={styles.price}>{item.final_price}</Text>
             </View>
@@ -203,15 +210,16 @@ const WishlistPage = () => {
                   style={styles.icon}
                 />
                 <Text style={styles.rating}>
-                  {item.review_rating && item.review_rating === "없음"
+                  {item.review_rating === "없음" || item.review_rating === ""
                     ? Math.floor(
                         rules[item.product_code[item.product_code.length - 1]] +
                           1
                       ) + 0.5
                     : item.review_rating}
                   (
-                  {item.review_cnt &&
-                    (item.review_cnt === "없음" ? 1 : item.review_cnt)}
+                  {item.review_cnt === "없음" || item.review_cnt === ""
+                    ? 1
+                    : item.review_cnt}
                   ) <Text style={{ gap: 4 }}> ・ </Text>
                 </Text>
                 <View style={styles.heartWrapper}>
@@ -292,7 +300,7 @@ const styles = StyleSheet.create({
   },
   checkboxWrap: {
     position: "absolute",
-    top: -200, // 체크박스 위치 (필요하다면 조정)
+    top: 10,
     left: 10,
     width: 16,
     height: 16,
