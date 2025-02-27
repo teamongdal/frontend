@@ -63,7 +63,7 @@ const VideoPlayer = forwardRef(
       if (!status.isLoaded) return;
       const currentTime = status.positionMillis / 1000; // 밀리초 → 초 변환
       if (curIdx >= stopTimes.length) return;
-      console.log("currentTime: ", currentTime);
+      // console.log("currentTime: ", currentTime);
       if (currentTime >= stopTimes[curIdx]) {
         setIsPlaying(false);
         setShowSearchButtons(true);

@@ -8,7 +8,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
-import VideoPlayer from "../molecule/VideoPlayer"; // 수정된 VideoPlayer.js를 사용
+import VideoPlayer from "../molecule/VideoPlayer"; // expo-av 기반 VideoPlayer
 import ViewShot, { captureRef } from "react-native-view-shot";
 import { useNavigation } from "@react-navigation/native";
 import { Audio } from "expo-av";
@@ -87,9 +87,16 @@ const VideoDetailPage = ({ route }) => {
       });
   }, [videoId]);
 
-  const handleClickSearch = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
+  // expo-av Video에서는 pauseAsync() 사용
+  const handleClickSearch = async () => {
+    console.log("handleClickSearch clicked");
+    if (videoRef.current && videoRef.current.pauseAsync) {
+      try {
+        await videoRef.current.pauseAsync();
+      } catch (error) {
+        console.error("Error pausing video:", error);
+      }
+    } else {
       setIsPlaying(false);
     }
     startRecording();
@@ -105,13 +112,12 @@ const VideoDetailPage = ({ route }) => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      const recordingInstance = new Audio.Recording();
-      await recordingInstance.prepareToRecordAsync({
-        isMeteringEnabled: false,
+      // 녹음 옵션: Android는 m4a, iOS는 WAV(LinearPCM)
+      const recordingOptions = {
         android: {
-          extension: ".wav",
-          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT,
-          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AMR_NB,
+          extension: ".m4a",
+          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
           sampleRate: 44100,
           numberOfChannels: 1,
           bitRate: 128000,
@@ -124,7 +130,10 @@ const VideoDetailPage = ({ route }) => {
           numberOfChannels: 1,
           bitRate: 128000,
         },
-      });
+      };
+
+      const recordingInstance = new Audio.Recording();
+      await recordingInstance.prepareToRecordAsync(recordingOptions);
       await recordingInstance.startAsync();
       setRecording(recordingInstance);
       handleCapture();
@@ -134,10 +143,12 @@ const VideoDetailPage = ({ route }) => {
   }
 
   async function stopRecording() {
+    console.log("stopRecording clicked");
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
     await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
     const uri = recording.getURI();
+    console.log("Recording stopped, URI:", uri);
     sendAudioToServer(uri);
     setIsLoading(true);
   }
@@ -158,6 +169,7 @@ const VideoDetailPage = ({ route }) => {
         name: "captured_image.png",
         type: "image/png",
       });
+      // 파일 타입 결정: iOS produces .wav, Android produces .m4a
       const fileType = audioUri.endsWith(".wav") ? "audio/wav" : "audio/m4a";
       formData.append("audio", {
         uri: audioUri.startsWith("file://") ? audioUri : `file://${audioUri}`,
@@ -273,14 +285,14 @@ const VideoDetailPage = ({ route }) => {
           </TouchableOpacity>
           <Text style={styles.examTextWrap}>{textList[curTextIdx]}</Text>
           {recording == null ? (
-            <TouchableOpacity style={styles.captureButton} onPress={handleClickSearch}>
+            <TouchableOpacity style={styles.micButtonContainer} onPress={handleClickSearch}>
               <Image
                 source={require("../../assets/voice.png")}
                 style={styles.micButton}
               />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.captureButton} onPress={stopRecording}>
+            <TouchableOpacity style={styles.micButtonContainer} onPress={stopRecording}>
               <Image
                 source={require("../../assets/unvoice.png")}
                 style={styles.micButton}
@@ -290,9 +302,7 @@ const VideoDetailPage = ({ route }) => {
         </View>
       )}
       {isLoading && <LoadingScreen capturedImage={capturedImage} />}
-      {isRetry && (
-        <RetryAlertPage setIsRetry={setIsRetry} retryText={retryText} />
-      )}
+      {isRetry && <RetryAlertPage setIsRetry={setIsRetry} retryText={retryText} />}
       {productListVisible && productList && (
         <ProductListTestPage
           productList={productList}
@@ -337,13 +347,17 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     left: "-300%",
   },
-  micButton: {
-    padding: 5,
+  micButtonContainer: {
+    position: "absolute",
+    bottom: "20%",
+    right: -350, // 마이크 아이콘이 보이도록
     width: 100,
     height: 100,
-    backgroundColor: "white",
-    borderRadius: 100,
-    right: "-750",
+  },
+  micButton: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
   },
   examTextWrap: {
     flexDirection: "row",
@@ -362,7 +376,6 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderWidth: 2,
     borderColor: "#a11a32",
-    display: "flex",
     marginBottom: 50,
   },
   playPauseButton: {

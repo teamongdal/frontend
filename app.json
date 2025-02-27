@@ -22,6 +22,7 @@
       "bundleIdentifier": "com.jeongyun0jang.frontend"
     },
     "android": {
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
