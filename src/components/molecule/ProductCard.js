@@ -31,7 +31,7 @@ const ProductCard = ({ data, onPress, isActive }) => {
           </Text>
 
           <View style={styles.priceRow}>
-            {data.discount_rate !== "0" && (
+            {data.discount_rate !== "0%" && (
               <Text style={styles.discount}>{data.discount_rate}</Text>
             )}
             <Text style={styles.price}>₩ {data.final_price}</Text>

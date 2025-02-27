@@ -38,16 +38,29 @@ const App = () => {
         <Stack.Screen
           name="VideoDetail"
           component={VideoDetailPage}
+          options={{
+            headerTitle: "", // 헤더의 제목 제거
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+          }}
           // options={{ headerShown: false }}
         />
         <Stack.Screen
           name="HighLightPage"
           component={HighLightPage}
+          options={{
+            headerTitle: "", // 헤더의 제목 제거
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+          }}
           // options={{ headerShown: false }}
         />
         <Stack.Screen
           name="WishlistPage"
           component={WishlistPage}
+          options={{
+            title: "위시리스트",
+          }}
           // options={{ headerShown: false }}
         />
       </Stack.Navigator>

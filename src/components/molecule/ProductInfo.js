@@ -31,7 +31,7 @@ const ProductInfo = ({ item, isFilterEnabled }) => {
       }
 
       const data = await response.json();
-      console.log("API 응답 데이터:", data);
+      // console.log("API 응답 데이터:", data);
 
       setIsLike(!isLike);
     } catch (error) {
@@ -61,13 +61,19 @@ const ProductInfo = ({ item, isFilterEnabled }) => {
               handleClickLike();
             }}
           >
-            <Icon name={"heart"} size={30} color={"gray"} />
+            <Icon
+              name={"heart"}
+              size={30}
+              color={isLike ? "#a11a32" : "gray"}
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.categoryTag}>
           <Text style={styles.categoryText}>{item.category}</Text>
         </View>
-        <Text style={styles.productTitle}>{item.product_name}</Text>
+        <Text style={styles.productTitle} numberOfLines={2}>
+          {item.product_name}
+        </Text>
         {item.discount_rate != "0%" && item.discount_rate != "0" && (
           <Text style={styles.discount}>{item.discount_rate}</Text>
         )}
@@ -90,7 +96,7 @@ const styles1 = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    borderWidth: 5,
+    borderWidth: 17,
     borderColor: "#1C3462",
   },
   productImage: {
