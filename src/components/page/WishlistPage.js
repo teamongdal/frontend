@@ -9,13 +9,26 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-// ★ 수정: "@react-native-community/checkbox" 대신 expo-checkbox를 import
 import Checkbox from "expo-checkbox";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { server_url } from "../../api/function";
 
 const { width, height } = Dimensions.get("window");
-const ITEM_WIDTH = (width - 48) / 2;
+// 가로폭이 700 이상이면 태블릿/가로모드 등 큰 화면이라고 가정
+const isWideScreen = width >= 700;
+
+// 큰 화면에서의 최대 컨테이너 폭 (원하는 값으로 조정 가능)
+const MAX_CONTAINER_WIDTH = 700;
+
+// 실제로 FlatList 안쪽 컨테이너 폭을 구함
+// - 작은 화면: 전체 폭 - 패딩 (대략 24)
+// - 큰 화면: 최대 폭
+const containerWidth = isWideScreen ? MAX_CONTAINER_WIDTH : width - 24;
+
+// 2컬럼을 유지하기 위해 아이템 폭 계산
+// (가운데 정렬을 위해서 margin, padding 등을 고려해 적절히 조정)
+const ITEM_MARGIN = 6 * 2; // 양 옆 margin 합
+const ITEM_WIDTH = (containerWidth - ITEM_MARGIN) / 2;
 
 const WishlistPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -33,18 +46,6 @@ const WishlistPage = () => {
   }, [cartItems]);
 
   const rules = [3.1, 3.1, 3, 3.2, 3, 3.4, 3, 3.1, 3.9, 3.6];
-
-  // 아래 CustomCheckbox는 사용하지 않고 있으나, 필요시 대안으로 사용 가능합니다.
-  const CustomCheckbox = ({ isChecked, onToggle }) => {
-    return (
-      <TouchableOpacity
-        style={[styles.checkbox, isChecked && styles.checked]}
-        onPress={onToggle}
-      >
-        {isChecked && <Icon name="check" size={14} color="#FFF" />}
-      </TouchableOpacity>
-    );
-  };
 
   // 전체 선택 여부 동기화
   useEffect(() => {
@@ -64,7 +65,6 @@ const WishlistPage = () => {
       .then((data) => {
         setCartItems(data.cart_list || []);
         setIsLoading(false);
-        console.log("=======data.cart_list: ======", data.cart_list[0]);
       })
       .catch((error) => {
         console.error("API 요청 실패:", error);
@@ -132,7 +132,6 @@ const WishlistPage = () => {
       {/* 전체 선택 & 필터 */}
       <View style={styles.filterContainer}>
         <View style={styles.checkboxContainer}>
-          {/* ★ 수정: <CheckBox> → <Checkbox> */}
           <Checkbox
             style={[styles.checkboxWrap, styles.bigCheckbox]}
             value={selectAll && deleteItemList.length === cartItems.length}
@@ -257,9 +256,17 @@ const WishlistPage = () => {
   );
 };
 
+// ★ StyleSheet 부분에서 큰 화면 대응을 위한 수정
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   filterContainer: {
+    // 가운데 정렬을 위해 alignSelf 사용
+    alignSelf: "center",
+    // 위에서 계산한 containerWidth 적용
+    width: containerWidth,
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
@@ -280,11 +287,16 @@ const styles = StyleSheet.create({
   smallSwitch: {
     transform: [{ scaleX: 0.6 }, { scaleY: 0.6 }],
   },
+  // FlatList 내부 컨텐츠 스타일
   listContainer: {
-    paddingHorizontal: 12,
+    // 가운데 정렬
+    alignSelf: "center",
+    // 위에서 계산한 containerWidth 적용
+    width: containerWidth,
     paddingBottom: 20,
   },
   itemContainer: {
+    // ITEM_WIDTH 활용
     width: ITEM_WIDTH,
     margin: 6,
     borderRadius: 10,
@@ -295,7 +307,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 209,
+    height: 300,
     borderRadius: 8,
   },
   checkboxWrap: {
